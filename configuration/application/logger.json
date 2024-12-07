@@ -1,0 +1,7 @@
+{
+  "enable": true,
+  "all_path_match": false,
+  "gw_task_subscriber": false,
+  "custom_paths": [],
+  "threshold_min": 5
+}

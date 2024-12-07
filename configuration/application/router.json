@@ -1,0 +1,14 @@
+{
+  "services": [
+    {
+      "service_name": "user-service",
+      "service_url": "http://application.com",
+      "access_client": [
+        "THIRD_PARTY",
+        "WEB_PAGE",
+        "PORTAL",
+        "ALLOWED_PATHS"
+      ]
+    }
+  ]
+}

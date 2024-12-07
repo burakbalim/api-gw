@@ -1,0 +1,27 @@
+[
+  {
+    "name": "userCreationMiddleware",
+    "extended_paths": {
+      "transform_headers": [
+        {
+          "path": "/create",
+          "method": "POST",
+          "delete_headers": [
+            "authorization"
+          ],
+          "add_headers": {
+            "app-header": "9999"
+          }
+        }
+      ],
+      "url_rewrites": [
+        {
+          "path": "/create",
+          "method": "POST",
+          "match_pattern": "/create$",
+          "rewrite_to": "/user-service/create"
+        }
+      ]
+    }
+  }
+]

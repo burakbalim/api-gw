@@ -1,0 +1,21 @@
+[
+  {
+    "name": "third_party_public_basic_auth_credit_api",
+    "api_id": "third_party_public_basic_auth_credit_api",
+    "use_basic_auth": true,
+    "pre": {
+      "require_session": true,
+      "middlewares": [
+        "userCreationMiddleware"
+      ]
+    },
+    "paths": [
+      {
+        "method": "POST",
+        "endpoint": "/user/create"
+      }
+    ],
+    "policy": "applicationEndpointPolicy",
+    "listen_path": "/gw/public/specific-endpoint"
+  }
+]
