@@ -30,7 +30,7 @@ The Licensed Software is provided "as is" without warranties of any kind, either
 In no event shall Licensor be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with the use or inability to use the Licensed Software, even if Licensor has been advised of the possibility of such damages.
 
 ## 9. Governing Law
-This Agreement shall be governed by and construed in accordance with the laws of [Your Country/Region], without regard to its conflict of law principles.
+This Agreement shall be governed by and construed in accordance with the laws of [Turkey], without regard to its conflict of law principles.
 
 ## 10. Entire Agreement
 This Agreement constitutes the entire agreement between Licensor and Licensee regarding the Licensed Software and supersedes all prior agreements or understandings.
@@ -42,4 +42,4 @@ By using the Licensed Software, Licensee acknowledges and agrees to the terms an
 **Licensor Information:**
 Name: Burak Balım  
 Contact: hburakbalim@gmail.com  
-Address: [Your Address]
+Address: Antalya, Turkey
