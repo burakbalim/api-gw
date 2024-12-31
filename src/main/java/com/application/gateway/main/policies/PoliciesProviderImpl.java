@@ -19,7 +19,7 @@ public class PoliciesProviderImpl extends ConfigurableBase<PoliciesCollections> 
 
     private ConfigurationSourceDTO<PoliciesCollections> configurationSourceDTO;
     private final RateLimiterService rateLimiterService;
-    Map<String, PolicyState> policyStateMap;
+    private Map<String, PolicyState> policyStateMap;
 
     public PoliciesProviderImpl(ConfigurationProvider<PoliciesCollections> configurationProvider, RateLimiterService rateLimiterService) {
         super(configurationProvider);

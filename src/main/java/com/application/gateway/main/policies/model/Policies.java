@@ -2,7 +2,9 @@ package com.application.gateway.main.policies.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.application.gateway.orchestration.ConfigurationBaseDTO;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -10,6 +12,8 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Policies implements ConfigurationBaseDTO {
 
     @JsonProperty("name")

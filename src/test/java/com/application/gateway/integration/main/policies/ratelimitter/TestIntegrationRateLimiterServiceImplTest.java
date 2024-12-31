@@ -1,13 +1,15 @@
-package com.application.gateway.main.policies.ratelimitter;
+package com.application.gateway.integration.main.policies.ratelimitter;
 
 import com.application.gateway.BaseTest;
 import com.application.gateway.common.exception.RateLimitExceedException;
+import com.application.gateway.main.policies.ratelimitter.RateLimit;
+import com.application.gateway.main.policies.ratelimitter.RateLimiterServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class  TestIntegrationRateLimiterServiceImplTest extends BaseTest {
+class TestIntegrationRateLimiterServiceImplTest extends BaseTest {
 
     @Autowired
     private RateLimiterServiceImpl rateLimiterService;

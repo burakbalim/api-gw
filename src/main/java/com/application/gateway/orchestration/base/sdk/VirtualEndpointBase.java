@@ -30,4 +30,12 @@ public abstract class VirtualEndpointBase implements VirtualEndpoint {
             throw new RuntimeException(e);
         }
     }
+
+    public LoggerProvider getLogger() {
+        return logger;
+    }
+
+    public Env getEnv() {
+        return env;
+    }
 }

@@ -34,4 +34,12 @@ public abstract class MiddlewareBase implements MiddlewareFunction {
     public <T> T getBean(Class<T> t) {
         return applicationContext.getBean(t);
     }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
 }

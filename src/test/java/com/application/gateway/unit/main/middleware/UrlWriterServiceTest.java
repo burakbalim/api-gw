@@ -1,5 +1,6 @@
-package com.application.gateway.main.middleware;
+package com.application.gateway.unit.main.middleware;
 
+import com.application.gateway.main.middleware.UrlWriterService;
 import com.application.gateway.main.middleware.model.UrlRewrites;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;

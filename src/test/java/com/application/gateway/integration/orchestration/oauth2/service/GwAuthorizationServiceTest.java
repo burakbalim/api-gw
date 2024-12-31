@@ -1,9 +1,10 @@
-package com.application.gateway.orchestration.oauth2.service;
+package com.application.gateway.integration.orchestration.oauth2.service;
 
 import com.application.gateway.BaseTest;
 import com.application.gateway.common.exception.UnauthorizedException;
 import com.application.gateway.orchestration.oauth2.model.RegisteredClientDTO;
 import com.application.gateway.orchestration.oauth2.model.UserDTO;
+import com.application.gateway.orchestration.oauth2.service.GwAuthorizationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationToken;
