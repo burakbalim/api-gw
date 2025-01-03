@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!-- Logstash server's address -->
+        <destination>logstash.default.svc.cluster.local:5000</destination>
+
+        <!-- Encoder configuration -->
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <provider class="net.logstash.logback.encoder.org.apache.logging.log4j.pattern.TimestampJsonProvider"/>
+                <provider class="net.logstash.logback.encoder.LoggingEventJsonProvider"/>
+                <provider class="net.logstash.logback.encoder.org.apache.logging.log4j.pattern.LoggerNameJsonProvider"/>
+                <provider class="net.logstash.logback.encoder.org.apache.logging.log4j.pattern.ThreadNameJsonProvider"/>
+                <provider class="net.logstash.logback.encoder.LevelJsonProvider"/>
+                <provider class="net.logstash.logback.encoder.MessageJsonProvider"/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="LOGSTASH" />
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+</configuration>
