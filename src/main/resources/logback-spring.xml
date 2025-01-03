@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <property name="LOG_FILE" value="/var/log/application/app.log"/>
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/var/log/application/app.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>logstash-service.default.svc.cluster.local:5044</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"app_name":"api-gw"}</customFields>
+        </encoder>
+    </appender>
+
+    <springProfile name="dev">
+        <root level="WARN">
+            <appender-ref ref="LOGSTASH" />
+            <appender-ref ref="CONSOLE" />
+        </root>
+        <logger name="org.springframework.jdbc.core.JdbcTemplate" level="WARN" />
+        <logger name="org.springframework" level="WARN" />
+    </springProfile>
+
+    <springProfile name="test">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
+            <appender-ref ref="LOGSTASH" />
+        </root>
+        <logger name="org.springframework.jdbc.core.JdbcTemplate" level="ERROR" />
+        <logger name="org.springframework" level="WARN" />
+        <logger name="org.application" level="INFO" />
+    </springProfile>
+
+</configuration>
