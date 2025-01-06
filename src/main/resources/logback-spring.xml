@@ -6,7 +6,7 @@
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>logstash.default.svc.cluster.local:5000</destination>
+        <destination>logstash.default.svc.cluster.local:5044</destination>
         <keepAliveDuration>5 minutes</keepAliveDuration>
         <reconnectionDelay>1 second</reconnectionDelay>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
@@ -21,5 +21,4 @@
             <appender-ref ref="CONSOLE" />
         </root>
     </springProfile>
-
 </configuration>

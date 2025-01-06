@@ -1,0 +1,14 @@
+apiVersion: skaffold/v4beta2
+kind: Config
+build:
+  artifacts:
+    - image: ghcr.io/burakbalim/api-gw
+deploy:
+  helm:
+    releases:
+      - name: api-gw
+        remoteChart: https://raw.githubusercontent.com/burakbalim/kubernetes-infra/master/zipped/service.tar.gz
+        valuesFiles:
+          - https://raw.githubusercontent.com/burakbalim/kubernetes-infra/master/values/api-gw-values.yaml
+        setValues:
+          image.tag: "latest"
