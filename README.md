@@ -43,9 +43,11 @@ The system consists of the following components:
 ### Data Model
 **Configuration Data Model**:
 - `config_source`: Configuration source (e.g., file, MongoDB).
-- `rate_limits`: Rate limit rules.
+- `policies`: Rate limit rules and other rules.
 - `auth_providers`: List of OAuth2 authentication providers.
 - `clients`: Application authentication information and grant types.
+- `virtual_endpoints`: Provide virtual endpoints via custom definition (implement VirtualEndpointProvider, it will support javascript in the future)
+- `middleware`: Provide middleware via custom definition (implement related MiddleweProvider, it will support javascript in the future)
 
 ### APIs
 - **OAuth2 Token Endpoint**:
