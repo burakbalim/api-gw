@@ -15,10 +15,17 @@
         </encoder>
     </appender>
 
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
     <springProfile name="dev">
         <root level="INFO">
             <appender-ref ref="LOGSTASH" />
             <appender-ref ref="CONSOLE" />
+            <appender-ref ref="STDOUT" />
         </root>
     </springProfile>
 </configuration>
