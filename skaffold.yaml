@@ -3,6 +3,11 @@ kind: Config
 build:
   artifacts:
     - image: ghcr.io/burakbalim/api-gw
+  local:
+    push: false
+    useBuildkit: true
+    tryImportMissing: true
+
 deploy:
   helm:
     releases:
