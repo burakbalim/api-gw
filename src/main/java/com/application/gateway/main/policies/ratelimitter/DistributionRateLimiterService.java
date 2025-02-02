@@ -10,6 +10,7 @@ import io.github.bucket4j.distributed.ExpirationAfterWriteStrategy;
 import io.github.bucket4j.redis.jedis.cas.JedisBasedProxyManager;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.JedisPool;
 
@@ -19,7 +20,8 @@ import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
-public class RateLimiterServiceImpl implements RateLimiterService {
+@ConditionalOnProperty(value="rate.limit.distribution.enabled", havingValue = "true")
+public class DistributionRateLimiterService implements RateLimiterService {
 
     private static final String BUCKET_KEY = "_rate_limiter";
 
@@ -29,13 +31,17 @@ public class RateLimiterServiceImpl implements RateLimiterService {
 
     @PostConstruct
     public void init() {
-        proxyManager = JedisBasedProxyManager.builderFor((JedisPool) cacheProvider.getConnectionInstance());
+        if (cacheProvider.getConnectionInstance() instanceof JedisPool) {
+            proxyManager = JedisBasedProxyManager.builderFor((JedisPool) cacheProvider.getConnectionInstance());
+        } else {
+            throw new IllegalStateException("JedisPool is not available");
+        }
     }
 
     @Override
     public void configure(RateLimit rateLimit) {
         cacheProvider.put(rateLimit.getKey(), rateLimit);
-        getBucketProxy(rateLimit).reset();
+        resetExistingConfiguration(rateLimit);
     }
 
     @Override
@@ -67,5 +73,9 @@ public class RateLimiterServiceImpl implements RateLimiterService {
                 .addLimit(Bandwidth.classic(rateLimit.getRate(), Refill.intervally(rateLimit.getRate(), Duration.ofSeconds(rateLimit.getPer()))))
                 .addLimit(Bandwidth.classic(rateLimit.getQuotaMax(), Refill.intervally(rateLimit.getQuotaMax(), Duration.ofSeconds(rateLimit.getQuotaRenewalRate()))))
                 .build());
+    }
+
+    private void resetExistingConfiguration(RateLimit rateLimit) {
+        getBucketProxy(rateLimit).reset();
     }
 }

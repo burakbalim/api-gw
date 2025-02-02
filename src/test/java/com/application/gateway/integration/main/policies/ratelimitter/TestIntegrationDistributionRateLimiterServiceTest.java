@@ -3,16 +3,16 @@ package com.application.gateway.integration.main.policies.ratelimitter;
 import com.application.gateway.BaseTest;
 import com.application.gateway.common.exception.RateLimitExceedException;
 import com.application.gateway.main.policies.ratelimitter.RateLimit;
-import com.application.gateway.main.policies.ratelimitter.RateLimiterServiceImpl;
+import com.application.gateway.main.policies.ratelimitter.DistributionRateLimiterService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class TestIntegrationRateLimiterServiceImplTest extends BaseTest {
+class TestIntegrationDistributionRateLimiterServiceTest extends BaseTest {
 
     @Autowired
-    private RateLimiterServiceImpl rateLimiterService;
+    private DistributionRateLimiterService rateLimiterService;
 
     @Test
     void testTryConsume() {

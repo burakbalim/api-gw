@@ -3,7 +3,7 @@ package com.application.gateway.unit.main.policies.ratelimitter;
 import com.application.gateway.common.cache.CacheProvider;
 import com.application.gateway.common.exception.RateLimitExceedException;
 import com.application.gateway.main.policies.ratelimitter.RateLimit;
-import com.application.gateway.main.policies.ratelimitter.RateLimiterServiceImpl;
+import com.application.gateway.main.policies.ratelimitter.DistributionRateLimiterService;
 import io.github.bucket4j.distributed.BucketProxy;
 import io.github.bucket4j.redis.jedis.cas.JedisBasedProxyManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class RateLimiterServiceImplTest {
+class DistributionRateLimiterServiceTest {
 
     @Mock
     private CacheProvider<String, RateLimit> cacheProvider;
@@ -35,7 +35,7 @@ class RateLimiterServiceImplTest {
     private BucketProxy bucketProxy;
 
     @InjectMocks
-    private RateLimiterServiceImpl rateLimiterService;
+    private DistributionRateLimiterService rateLimiterService;
 
 
     @BeforeEach
