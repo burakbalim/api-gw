@@ -5,8 +5,11 @@
     <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
+    <springProperty scope="context" name="LOGSTASH_HOST" source="logging.logstash.host" defaultValue="logstash.default.svc.cluster.local"/>
+    <springProperty scope="context" name="LOGSTASH_PORT" source="logging.logstash.port" defaultValue="5044"/>
+
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>${LOGSTASH_HOST:logstash.default.svc.cluster.local}:5044</destination>
+        <destination>${LOGSTASH_HOST}:${LOGSTASH_PORT}</destination>
         <keepAliveDuration>5 minutes</keepAliveDuration>
         <reconnectionDelay>1 second</reconnectionDelay>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
