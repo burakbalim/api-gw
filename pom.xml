@@ -16,7 +16,7 @@
 	<properties>
 		<java.version>19</java.version>
 		<spring-cloud.version>2021.0.6</spring-cloud.version>
-		<postgresql-connector-version>9.1-901.jdbc4</postgresql-connector-version>
+		<postgresql-connector-version>42.7.1</postgresql-connector-version>
 		<spring-security-cas-version>6.1.4</spring-security-cas-version>
 		<bucket-4j>8.4.0</bucket-4j>
 		<bucket-4j-redis>7.6.0</bucket-4j-redis>
@@ -83,11 +83,11 @@
 			<version>${bucket-4j-redis}</version>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-			<version>${postgresql-connector-version}</version>
+			<version>42.7.1</version>  <!-- Use the latest version -->
 		</dependency>
+
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>

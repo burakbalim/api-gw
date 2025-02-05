@@ -26,7 +26,13 @@
 
     <springProfile name="dev">
         <root level="INFO">
-            <appender-ref ref="LOGSTASH" />
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="STDOUT" />
+        </root>
+    </springProfile>
+
+    <springProfile name="test">
+        <root level="INFO">
             <appender-ref ref="CONSOLE" />
             <appender-ref ref="STDOUT" />
         </root>

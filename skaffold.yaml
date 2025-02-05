@@ -4,7 +4,7 @@ build:
   artifacts:
     - image: ghcr.io/burakbalim/api-gw
   local:
-    push: false
+    push: true
     useBuildkit: true
     tryImportMissing: true
 
@@ -12,8 +12,11 @@ deploy:
   helm:
     releases:
       - name: api-gw
-        remoteChart: https://raw.githubusercontent.com/burakbalim/kubernetes-infra/master/zipped/service.tar.gz
+        #remoteChart: https://raw.githubusercontent.com/burakbalim/kubernetes-infra/master/zipped/service.tar.gz
+        chartPath: /Users/burakbalim/codes/bbalim-github/kubernetes-infra/applications/charts/service_app_1
         valuesFiles:
-          - https://raw.githubusercontent.com/burakbalim/kubernetes-infra/master/values/api-gw-values.yaml
+          - /Users/burakbalim/codes/bbalim-github/kubernetes-infra/values/api-gw-values.yaml
         setValues:
+          image.repository: ghcr.io/burakbalim/api-gw
           image.tag: "latest"
+

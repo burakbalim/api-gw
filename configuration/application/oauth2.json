@@ -22,24 +22,6 @@
       "client_secret": "XXX",
       "access_token_exp": 1000,
       "refresh_token_exp": 1000
-    },
-    {
-      "name": "mobile",
-      "type": "WEB_PAGE",
-      "grant_type": "refresh_token",
-      "client_id": "XXXX",
-      "client_secret": "XXX",
-      "access_token_exp": 1000,
-      "refresh_token_exp": 1000
-    },
-    {
-      "name": "portal",
-      "type": "PORTAL",
-      "grant_type": "refresh_token",
-      "client_id": "XXXX",
-      "client_secret": "XXX",
-      "access_token_exp": 60,
-      "refresh_token_exp": 60
     }
   ]
 }
