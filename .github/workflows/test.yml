@@ -1,2 +1,35 @@
-- name: Test Kubernetes Connection
-  run: kubectl get nodes
+name: K3s Deployment Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  k3s-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    # Install kubectl
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+    
+    # Setup K3s credentials
+    - name: Setup K3s Kubeconfig
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ secrets.K3S_KUBECONFIG }}" > ~/.kube/config
+        chmod 600 ~/.kube/config
+      
+    # Test connection
+    - name: Test K3s Connection
+      run: |
+        kubectl get nodes
+        kubectl cluster-info
+      env:
+        KUBECONFIG: ~/.kube/config
