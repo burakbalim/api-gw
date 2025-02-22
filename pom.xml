@@ -21,7 +21,7 @@
 		<bucket-4j>8.4.0</bucket-4j>
 		<bucket-4j-redis>7.6.0</bucket-4j-redis>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
-		<logback-version>1.4.12</logback-version>
+		<logback-version>1.4.11</logback-version>
 		<logstash-logback-encoder-version>7.4</logstash-logback-encoder-version>
 	</properties>
 	<dependencies>
