@@ -3,7 +3,7 @@ package com.application.gateway.integration.orchestration.oauth2.service;
 import com.application.gateway.BaseTest;
 import com.application.gateway.common.exception.UnauthorizedException;
 import com.application.gateway.orchestration.oauth2.model.RegisteredClientDTO;
-import com.application.gateway.orchestration.oauth2.model.UserDTO;
+import com.application.gateway.orchestration.oauth2.model.User;
 import com.application.gateway.orchestration.oauth2.service.GwAuthorizationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ class GwAuthorizationServiceTest extends BaseTest {
         registeredClientDTO.setClientId("43fa1e77-de98-XXXX-XXX-f1c320f65e55");
         registeredClientDTO.setClientSecret("gJAT9AtJ8P4dUz2L8XXXXj0seY5psRpZWLonIaxSCmYjccLmwLYH");
 
-        OAuth2AccessTokenAuthenticationToken authenticationToken = gwAuthorizationService.authenticateToRefreshToken(registeredClientDTO, new UserDTO(), "test");
+        OAuth2AccessTokenAuthenticationToken authenticationToken = gwAuthorizationService.authenticateToRefreshToken(registeredClientDTO, new User(), "test");
 
         assertTrue(Objects.nonNull(authenticationToken.getCredentials().toString()));
         assertTrue(Objects.nonNull(authenticationToken.getAccessToken().getTokenValue()));

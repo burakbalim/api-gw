@@ -99,6 +99,6 @@ public class GatewayProxyImpl implements GatewayProxy {
      */
     @Override
     public void afterRequest(ResponseInfo responseInfo) {
-        eventSource.fire(responseInfo);
+       // eventSource.fire(responseInfo);
     }
 }

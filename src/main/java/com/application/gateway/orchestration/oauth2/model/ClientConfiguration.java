@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -17,7 +19,7 @@ public class ClientConfiguration implements Serializable {
 
     @JsonProperty("grant_type")
     @Field("grant_type")
-    private String grantType;
+    private HashSet<String> grantType;
 
     @JsonProperty("type")
     @Field("type")
@@ -38,4 +40,16 @@ public class ClientConfiguration implements Serializable {
     @JsonProperty("refresh_token_exp")
     @Field("refresh_token_exp")
     private Integer refreshTokenExp;
+
+    @JsonProperty("scopes")
+    @Field("scopes")
+    private Set<String> scopes;
+
+    @JsonProperty("redirect_uris")
+    @Field("redirect_uris")
+    private Set<String> redirectUris;
+
+    @JsonProperty("authorization_uri")
+    @Field("authorization_uri")
+    private String authorizationUri;
 }

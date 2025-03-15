@@ -5,18 +5,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 public abstract class UserDTOMixin {
 
     @JsonCreator
-    UserDTOMixin(@JsonProperty("id") Long id, @JsonProperty("name") String name, @JsonProperty("surname") String surname,
-                 @JsonProperty("status") String status,
-                 @JsonProperty("gender") String gender,
-                 @JsonProperty("phone") String phone,
-                 @JsonProperty("language") String language,
-                 @JsonProperty("type") String type
-                 ) {
+    UserDTOMixin(@JsonProperty("username") String username,
+                 @JsonProperty("email") String email,
+                 @JsonProperty("password") String password,
+                 @JsonProperty("authProvider") String authProvider,
+                 @JsonProperty("externalId") String externalId,
+                 @JsonProperty("birthDate") LocalDate birthDate
+    ) {
 
     }
 }

@@ -1,18 +1,22 @@
 package com.application.gateway.orchestration.oauth2.config;
 
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.application.gateway.orchestration.common.dto.ConfigurationSourceDTO;
 import com.application.gateway.orchestration.oauth2.config.matchers.AllowedPathsRequestMatcher;
-import com.application.gateway.orchestration.oauth2.config.matchers.FunnelRequestMatcher;
+import com.application.gateway.orchestration.oauth2.config.matchers.AppRequestMatcher;
 import com.application.gateway.orchestration.oauth2.config.matchers.PortalRequestMatcher;
 import com.application.gateway.orchestration.oauth2.config.matchers.ThirdPartyRequestMatcher;
-import com.application.gateway.orchestration.oauth2.model.UserDTO;
+import com.application.gateway.orchestration.oauth2.customtoken.CustomAuthenticationConverter;
+import com.application.gateway.orchestration.oauth2.customtoken.CustomAuthenticationProvider;
+import com.application.gateway.orchestration.oauth2.model.User;
 import com.application.gateway.orchestration.oauth2.registeredclient.RegisteredClientRepositoryImpl;
+import com.application.gateway.orchestration.oauth2.service.GwAuthorizationService;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -60,15 +64,15 @@ import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterN
 @SuppressWarnings("deprecation")
 public class WebSecurityConfig {
 
-    private final FunnelRequestMatcher funnelRequestMatcher;
+    private final ApplicationContext applicationContext;
+
+    private final AppRequestMatcher appRequestMatcher;
 
     private final PortalRequestMatcher portalRequestMatcher;
 
     private final ThirdPartyRequestMatcher thirdPartyRequestMatcher;
 
     private final AllowedPathsRequestMatcher allowedPathsRequestMatcher;
-
-    //private final UserService userService;
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -85,10 +89,10 @@ public class WebSecurityConfig {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         return http
                 .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                /*.tokenEndpoint(tokenEndpoint -> tokenEndpoint
-                        .accessTokenRequestConverter(new CustomPasswordAuthenticationConverter())
-                        .authenticationProvider(new CustomPasswordAuthenticationProvider(authorizationService(), tokenGenerator(), userService))
-                )*/
+                .tokenEndpoint(tokenEndpoint -> tokenEndpoint
+                        .accessTokenRequestConverter(new CustomAuthenticationConverter())
+                        .authenticationProvider(new CustomAuthenticationProvider(gwAuthorizationService(), applicationContext))
+                )
                 .oidc(withDefaults())
                 .and()
                 .oauth2ResourceServer(httpSecurityOAuth2ResourceServerConfigurer -> httpSecurityOAuth2ResourceServerConfigurer.jwt(Customizer.withDefaults()))
@@ -112,7 +116,7 @@ public class WebSecurityConfig {
                 authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry.
                                 requestMatchers(allowedPathsRequestMatcher).permitAll().
-                                requestMatchers(funnelRequestMatcher).authenticated().
+                                requestMatchers(appRequestMatcher).authenticated().
                                 requestMatchers(portalRequestMatcher).authenticated().
                                 requestMatchers(thirdPartyRequestMatcher).authenticated().
                                 anyRequest().permitAll()
@@ -188,7 +192,7 @@ public class WebSecurityConfig {
         objectMapper.registerModules(securityModules);
         objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
         objectMapper.addMixIn(OAuth2ClientAuthenticationToken.class, OAuth2ClientAuthenticationTokenMixin.class);
-        objectMapper.addMixIn(UserDTO.class, UserDTOMixin.class);
+        objectMapper.addMixIn(User.class, UserDTOMixin.class);
 
         rowMapper.setObjectMapper(objectMapper);
         oAuth2AuthorizationParametersMapper.setObjectMapper(objectMapper);
@@ -236,11 +240,17 @@ public class WebSecurityConfig {
         };
     }
 
+    @Bean
+    public GwAuthorizationService gwAuthorizationService() {
+        return new GwAuthorizationService(registeredClientRepository(), tokenGenerator(), authorizationService(), authorizationServerSettings());
+    }
+
     private void addForRefreshToken(JwtEncodingContext context, OAuth2ClientAuthenticationToken principal, RegisteredClient registeredClient) {
         if (registeredClient.getAuthorizationGrantTypes().contains(new AuthorizationGrantType(REFRESH_TOKEN))) {
-            UserDTO user = (UserDTO) principal.getDetails();
-            if (Objects.nonNull(user.getName())) {
-                context.getClaims().claim("user", user.getName());
+            User user = (User) principal.getDetails();
+            if (Objects.nonNull(user.getUsername())) {
+                context.getClaims().claim("username", user.getUsername());
+                context.getClaims().claim("registered_client_id", registeredClient.getClientId());
             }
         }
     }

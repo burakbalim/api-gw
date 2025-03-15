@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.application.gateway.common.util.DynamicWrapper;
 import com.application.gateway.common.util.InnerData;
-import com.application.gateway.orchestration.oauth2.model.UserDTO;
+import com.application.gateway.orchestration.oauth2.model.User;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
@@ -39,7 +39,7 @@ public class OAuth2ClientAuthenticationTokenDeserializer extends JsonDeserialize
 
     private OAuth2ClientAuthenticationToken deserialize(ObjectMapper mapper, JsonNode root) throws JsonProcessingException {
         JsonNode registeredClientJsonNode = root.get("registeredClient");
-        UserDTO details = mapper.treeToValue(root.get("details"), UserDTO.class);
+        User details = mapper.treeToValue(root.get("details"), User.class);
         String clientIdIssueAtValue = getValue(registeredClientJsonNode.get("clientIdIssueAt"));
         Instant clientIdIssueAt = Objects.nonNull(clientIdIssueAtValue) ? Instant.parse(clientIdIssueAtValue) : null;
         String clientSecretExpiresAtValue = getValue(registeredClientJsonNode.get("clientSecretExpiresAt"));

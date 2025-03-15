@@ -1,7 +1,7 @@
 package com.application.gateway.common.exception.handler;
 
 import com.application.gateway.common.exception.*;
-import com.application.gateway.orchestration.oauth2.service.ClientUnauthorizedException;
+import com.application.gateway.orchestration.oauth2.exception.ClientUnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.Objects;
 
 @ControllerAdvice
 @RequiredArgsConstructor
@@ -21,14 +23,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public final ResponseEntity<StandardErrorResponse> handleAllApiExceptions(UnauthorizedException ex) {
         log.error("[UnauthorizedException] requested. Message: {}", ex.getMessage());
-        return new ResponseEntity<>(new StandardErrorResponse("Unauthorized"), HttpStatus.FORBIDDEN);
+        if (Objects.nonNull(ex.getCause())) {
+            log.error("", ex.getCause());;
+        }
+        return new ResponseEntity<>(new StandardErrorResponse("Unauthorized"), HttpStatus.UNAUTHORIZED);
     }
 
     @ResponseBody
     @ExceptionHandler(ClientUnauthorizedException.class)
     public final ResponseEntity<ClientUnauthorizedResponse> handleAllApiExceptions(ClientUnauthorizedException ex) {
         log.trace("[ClientUnauthorizedException] requested. Message: {}", ex.getMessage());
-        return new ResponseEntity<>(ex.getClientUnauthorizedResponse(), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(ex.getClientUnauthorizedResponse(), HttpStatus.UNAUTHORIZED);
     }
 
     @ResponseBody
@@ -48,7 +53,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BasicTokenUnauthorizedException.class)
     public final ResponseEntity<StandardErrorResponse> handleAllApiExceptions(BasicTokenUnauthorizedException ex) {
         log.error("[BasicTokenUnauthorizedException] requested. Message: {}", ex.getMessage());
-        return new ResponseEntity<>(new StandardErrorResponse("User not authorised"), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(new StandardErrorResponse("User not authorised"), HttpStatus.UNAUTHORIZED);
     }
 
     /**

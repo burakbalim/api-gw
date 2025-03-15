@@ -8,8 +8,6 @@ public interface Constants {
 
     List<String> BASIC_AUTH_PATHS = List.of("api/keys/*", "api/apis/*");
 
-    String CUSTOM_PASSWORD_GRANT_TYPE = "custom_password";
-
     String AUTHORIZATION = "Authorization";
 
     String BEARER = "Bearer ";

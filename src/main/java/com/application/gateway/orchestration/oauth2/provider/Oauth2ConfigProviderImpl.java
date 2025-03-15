@@ -1,15 +1,12 @@
 package com.application.gateway.orchestration.oauth2.provider;
 
-import com.application.gateway.common.util.Constants;
 import com.application.gateway.common.util.PathUtils;
 import com.application.gateway.orchestration.ConfigurableBase;
 import com.application.gateway.orchestration.common.dto.ConfigurationSourceDTO;
 import com.application.gateway.orchestration.common.repository.ConfigurationProvider;
 import com.application.gateway.orchestration.oauth2.config.matchers.RequestMatcherBase;
-import com.application.gateway.orchestration.oauth2.model.ClientConfiguration;
-import com.application.gateway.orchestration.oauth2.model.ClientType;
-import com.application.gateway.orchestration.oauth2.model.OAuth2ConfigurationList;
-import com.application.gateway.orchestration.oauth2.model.PathConfiguration;
+import com.application.gateway.orchestration.oauth2.customtoken.CustomAuthorizationGrantType;
+import com.application.gateway.orchestration.oauth2.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -23,9 +20,6 @@ import java.security.Principal;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.springframework.security.oauth2.core.oidc.OidcScopes.OPENID;
-import static org.springframework.security.oauth2.core.oidc.OidcScopes.PROFILE;
 
 @Component
 @Slf4j
@@ -109,20 +103,23 @@ public class Oauth2ConfigProviderImpl extends ConfigurableBase<OAuth2Configurati
         if (Objects.nonNull(clientConfiguration.getRefreshTokenExp())) {
             tokenSettingBuilder.refreshTokenTimeToLive(Duration.ofMinutes(clientConfiguration.getRefreshTokenExp()));
         }
-        RegisteredClient.Builder builder = RegisteredClient.withId(clientConfiguration.getClientId());
-        if (clientConfiguration.getGrantType().equals(AuthorizationGrantType.REFRESH_TOKEN.getValue())) {
-            builder.authorizationGrantType(new AuthorizationGrantType(Constants.CUSTOM_PASSWORD_GRANT_TYPE));
+
+        RegisteredClient.Builder builder = RegisteredClient.withId(clientConfiguration.getName());
+        if (clientConfiguration.getGrantType().contains(AuthorizationGrantType.REFRESH_TOKEN.getValue())) {
+            builder.authorizationGrantType(CustomAuthorizationGrantType.CUSTOM_PASSWORD);
         }
+
         return builder
                 .clientName(clientConfiguration.getName())
                 .clientId(clientConfiguration.getClientId())
                 .clientSecret(clientConfiguration.getClientSecret())
-                .authorizationGrantType(new AuthorizationGrantType(clientConfiguration.getGrantType()))
+                .authorizationGrantTypes(authorizationGrantTypes -> authorizationGrantTypes.addAll(clientConfiguration.getGrantType().stream().
+                        map(AuthorizationGrantType::new).collect(Collectors.toSet())))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_JWT)
                 .scope(clientConfiguration.getClientType().getRole())
-                .scope(OPENID)
-                .scope(PROFILE)
+                .scopes(scopes -> scopes.addAll(clientConfiguration.getScopes()))
+                //.redirectUris(uris -> uris.addAll(clientConfiguration.getRedirectUris()))
                 .tokenSettings(tokenSettingBuilder.build())
                 .build();
     }

@@ -1,9 +1,9 @@
 package com.application.gateway.orchestration.oauth2.service;
 
+import com.application.gateway.orchestration.oauth2.exception.ClientUnauthorizedException;
 import com.application.gateway.orchestration.oauth2.model.InternalAuthorizationServerContext;
 import com.application.gateway.orchestration.oauth2.model.RegisteredClientDTO;
-import com.application.gateway.orchestration.oauth2.model.UserDTO;
-import lombok.RequiredArgsConstructor;
+import com.application.gateway.orchestration.oauth2.model.User;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.*;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
@@ -17,15 +17,12 @@ import org.springframework.security.oauth2.server.authorization.context.Authoriz
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.DefaultOAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
-import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 
-@RequiredArgsConstructor
-@Service
 public class GwAuthorizationService {
 
     private final RegisteredClientRepository registeredClientRepository;
@@ -36,12 +33,19 @@ public class GwAuthorizationService {
 
     private final AuthorizationServerSettings authorizationServerSettings;
 
-    public OAuth2AccessTokenAuthenticationToken authenticateToRefreshToken(RegisteredClientDTO registeredClientDTO, UserDTO userDTO, String uri) {
+    public GwAuthorizationService(RegisteredClientRepository registeredClientRepository, OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator, OAuth2AuthorizationService authorizationService, AuthorizationServerSettings authorizationServerSettings) {
+        this.registeredClientRepository = registeredClientRepository;
+        this.tokenGenerator = tokenGenerator;
+        this.authorizationService = authorizationService;
+        this.authorizationServerSettings = authorizationServerSettings;
+    }
+
+    public OAuth2AccessTokenAuthenticationToken authenticateToRefreshToken(RegisteredClientDTO registeredClientDTO, User user, String uri) {
         RegisteredClient registeredClient = registeredClientRepository.findByClientId(registeredClientDTO.getClientId());
 
         validateRegisteredClient(registeredClientDTO, registeredClient, AuthorizationGrantType.REFRESH_TOKEN);
 
-        addSecurityContext(registeredClient, userDTO);
+        addSecurityContext(registeredClient, user);
 
         AuthorizationServerContextHolder.setContext(new InternalAuthorizationServerContext(uri, authorizationServerSettings));
 
@@ -106,7 +110,7 @@ public class GwAuthorizationService {
         return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal, accessToken);
     }
 
-    private void addSecurityContext(RegisteredClient registeredClient, UserDTO user) {
+    private void addSecurityContext(RegisteredClient registeredClient, User user) {
         OAuth2ClientAuthenticationToken oAuth2ClientAuthenticationToken = new OAuth2ClientAuthenticationToken(registeredClient, ClientAuthenticationMethod.CLIENT_SECRET_JWT, null);
         oAuth2ClientAuthenticationToken.setDetails(user);
         var newContext = SecurityContextHolder.createEmptyContext();

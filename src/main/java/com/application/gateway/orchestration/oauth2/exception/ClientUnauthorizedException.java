@@ -1,4 +1,4 @@
-package com.application.gateway.orchestration.oauth2.service;
+package com.application.gateway.orchestration.oauth2.exception;
 
 import com.application.gateway.common.exception.ClientUnauthorizedResponse;
 import com.application.gateway.common.exception.UnauthorizedException;

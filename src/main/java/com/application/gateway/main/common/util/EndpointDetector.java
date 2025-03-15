@@ -11,6 +11,10 @@ import com.application.gateway.orchestration.oauth2.model.ClientType;
 import com.application.gateway.orchestration.oauth2.provider.Oauth2ConfigProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -32,7 +36,7 @@ public class EndpointDetector {
      */
     public RequestInfoBase detectRequestInfo(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        ClientType clientType = oauth2ConfigProvider.getClientType(request.getUserPrincipal(), uri).orElseThrow(() -> new ClientTypeNotFoundException(uri));
+        ClientType clientType = oauth2ConfigProvider.getClientType(request.getUserPrincipal(), uri).orElseThrow(() -> new ClientTypeNotFoundException(uri));//TODO
         Optional<String> serviceUrlOptional = findServiceUrl(uri);
         if (virtualEndpointProvider.isContains(uri)) {
             return new VirtualEndpointRequestInfo(request, clientType);
@@ -43,5 +47,17 @@ public class EndpointDetector {
         else {
             return new UndefinedRequestInfo(request, clientType);
         }
+    }
+
+    public String getAuthenticationType() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication instanceof JwtAuthenticationToken) {
+            return "access_token";  // Bearer Token ile gelmiş
+        } else if (authentication instanceof OAuth2ClientAuthenticationToken) {
+            return "client_credentials";  // Client Credentials ile gelmiş
+        }
+
+        return "unknown"; // Başka bir authentication tipi (örneğin Basic Auth veya anonim erişim)
     }
 }

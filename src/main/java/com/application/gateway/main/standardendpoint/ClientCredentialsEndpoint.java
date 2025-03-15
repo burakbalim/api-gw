@@ -4,7 +4,7 @@ import com.application.gateway.common.util.Decoder;
 import com.application.gateway.main.common.VirtualEndpointRequestInfo;
 import com.application.gateway.orchestration.base.sdk.VirtualEndpointBase;
 import com.application.gateway.orchestration.oauth2.model.RegisteredClientDTO;
-import com.application.gateway.orchestration.oauth2.service.ClientUnauthorizedException;
+import com.application.gateway.orchestration.oauth2.exception.ClientUnauthorizedException;
 import com.application.gateway.orchestration.oauth2.service.GwAuthorizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
