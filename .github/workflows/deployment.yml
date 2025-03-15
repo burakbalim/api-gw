@@ -48,7 +48,7 @@ jobs:
       - name: Trigger Tekton Pipeline
         run: |
           tkn pipeline start deploy-multiple-services \
-            --serviceaccount=burakbalim \
+            --serviceaccount=github-actions \
             --param=BRANCH_ID=${{ env.BRANCH_ID }} \
             --param=NAMESPACE=${{ env.NAMESPACE }} \
             --param=GIT_REPO_URL=https://github.com/burakbalim \
