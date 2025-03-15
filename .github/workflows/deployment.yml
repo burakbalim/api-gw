@@ -48,6 +48,8 @@ jobs:
           export KUBECONFIG=./kubeconfig
        
       - name: Trigger Tekton Pipeline
+        env:
+          KUBECONFIG: $HOME/.kube/config
         run: |
           tkn pipeline start deploy-multiple-services \
             --serviceaccount=github-actions \
