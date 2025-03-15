@@ -43,6 +43,7 @@ jobs:
           echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
           chmod 600 kubeconfig
           export KUBECONFIG=./kubeconfig
+          export KUBERNETES_MASTER=./kubeconfig
 
       - name: Trigger Tekton Pipeline
         run: |
