@@ -19,7 +19,7 @@ jobs:
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
           
           if [ "$BRANCH" == "main" ]; then
-            echo "NAMESPACE=production" >> $GITHUB_ENV
+            echo "NAMESPACE=staging" >> $GITHUB_ENV
             echo "BRANCH_ID=main" >> $GITHUB_ENV
           elif [ "$BRANCH" == "staging" ]; then
             echo "NAMESPACE=staging" >> $GITHUB_ENV
