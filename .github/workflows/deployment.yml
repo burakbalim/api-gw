@@ -1,5 +1,8 @@
 name: Trigger Tekton Pipeline
 
+env:
+  KUBERNETES_MASTER: ${{ secrets.KUBERNETES_MASTER }}
+  
 on:
   push:
     branches:
