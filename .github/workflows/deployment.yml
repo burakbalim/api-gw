@@ -47,9 +47,7 @@ jobs:
           echo "${{ secrets.KUBE_CONFIG }}" > /home/runner/.kube/config
           chmod 600 /home/runner/.kube/config
           export KUBECONFIG=/home/runner/.kube/config
-          HOME_DIR="${HOME}"
-          echo "Home directory: ${HOME_DIR}"
-          ls -la ${HOME_DIR}/.kube/
+
           tkn pipeline start deploy-multiple-services \
             --serviceaccount=github-actions \
             --param=BRANCH_ID=${{ env.BRANCH_ID }} \
