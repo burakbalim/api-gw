@@ -50,7 +50,7 @@ jobs:
 
           tkn pipeline start service-deployment-pipeline \
             --serviceaccount=tekton-pipeline-sa \
-            --namespace=tekton-pipelines \
+            --namespace=tekton-tasks \
             --param=BRANCH_ID=${{ env.BRANCH_ID }} \
             --param=NAMESPACE=${{ env.NAMESPACE }} \
             --param=GIT_REPO_URL=https://github.com/burakbalim \
