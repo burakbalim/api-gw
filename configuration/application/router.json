@@ -1,8 +1,8 @@
 {
   "services": [
     {
-      "service_name": "user-service",
-      "service_url": "http://application.com",
+      "service_name": "user-resource-service",
+      "service_url": "http://localhost:8091",
       "access_client": [
         "THIRD_PARTY",
         "WEB_PAGE",

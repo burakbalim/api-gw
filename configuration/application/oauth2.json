@@ -1,27 +1,22 @@
 {
   "path_configurations": [
     {
-      "type": "PORTAL",
-      "paths": [
-        "/gw/portal"
-      ]
-    },
-    {
       "type": "ALLOWED_PATHS",
       "paths": [
-        "/gw/user-service/*"
+        "/gw/user-resource-service/api/v1/users"
       ]
     }
   ],
   "configurations": [
     {
-      "name": "web",
+      "name": "voice_repeater_app",
       "type": "WEB_PAGE",
-      "grant_type": "refresh_token",
-      "client_id": "XXXX",
-      "client_secret": "XXX",
-      "access_token_exp": 1000,
-      "refresh_token_exp": 1000
+      "grant_type": ["refresh_token", "google", "custom_password", "facebook", "apple"],
+      "client_id": "XXXXX",
+      "client_secret": "XXXXX",
+      "access_token_exp": 60,
+      "refresh_token_exp": 600,
+      "scopes": ["email"]
     }
   ]
 }
