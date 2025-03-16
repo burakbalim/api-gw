@@ -12,8 +12,8 @@
       "name": "voice_repeater_app",
       "type": "WEB_PAGE",
       "grant_type": ["refresh_token", "google", "custom_password", "facebook", "apple"],
-      "client_id": "XXXXX",
-      "client_secret": "XXXXX",
+      "client_id": "6bd9076f-0dbf-4482-aef1-d108fcb401a6",
+      "client_secret": "tKESWwwFCnVWFjyF2kDDQf8AiGQq9q627HTB6l6N",
       "access_token_exp": 60,
       "refresh_token_exp": 600,
       "scopes": ["email"]
