@@ -34,8 +34,7 @@ public abstract class ConfigurationWatcherBase implements ConfigWatcher {
             Configurable<?> configurable = pathToServiceMap.get(new ConfigurationSourceDTO<>(configurationSourceName));
             if (Objects.isNull(configurable)) {
                 log.error("Configurable is null for {}", configurationSourceName);
-            }
-            else {
+            } else {
                 configurable.notifyConfigurationChange();
             }
         } catch (Exception e) {
