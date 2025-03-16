@@ -51,6 +51,9 @@ jobs:
         env:
           KUBECONFIG: $HOME/.kube/config
         run: |
+          HOME_DIR="${HOME}"
+          echo "Home directory: ${HOME_DIR}"
+          ls -la ${HOME_DIR}/.kube/
           tkn pipeline start deploy-multiple-services \
             --serviceaccount=github-actions \
             --param=BRANCH_ID=${{ env.BRANCH_ID }} \
