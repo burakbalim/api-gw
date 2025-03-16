@@ -41,7 +41,7 @@ jobs:
           tar xvzf tkn_0.30.0_Linux_x86_64.tar.gz
           sudo mv tkn /usr/local/bin/
 
-      - name: Configure kubeconfig
+      - name: Deployment
         run: |
           mkdir -p /home/runner/.kube
           echo "${{ secrets.KUBE_CONFIG }}" > /home/runner/.kube/config
@@ -50,6 +50,7 @@ jobs:
 
           tkn pipeline start deploy-multiple-services \
             --serviceaccount=tekton-pipeline-sa \
+            --namespace=tekton-pipelines \
             --param=BRANCH_ID=${{ env.BRANCH_ID }} \
             --param=NAMESPACE=${{ env.NAMESPACE }} \
             --param=GIT_REPO_URL=https://github.com/burakbalim \
