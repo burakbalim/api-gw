@@ -47,7 +47,8 @@ jobs:
           echo "${{ secrets.KUBE_CONFIG }}" > /home/runner/.kube/config
           chmod 600 /home/runner/.kube/config
           export KUBECONFIG=/home/runner/.kube/config
-
+          kubectl get pipeline -n tekton-tasks
+          
           tkn pipeline start service-deployment-pipeline \
             --serviceaccount=tekton-pipeline-sa \
             --namespace=tekton-tasks \
