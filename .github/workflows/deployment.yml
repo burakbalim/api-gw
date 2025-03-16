@@ -48,7 +48,7 @@ jobs:
           chmod 600 /home/runner/.kube/config
           export KUBECONFIG=/home/runner/.kube/config
 
-          tkn pipeline start deploy-multiple-services \
+          tkn pipeline start service-deployment-pipeline \
             --serviceaccount=tekton-pipeline-sa \
             --namespace=tekton-pipelines \
             --param=BRANCH_ID=${{ env.BRANCH_ID }} \
