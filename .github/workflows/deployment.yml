@@ -49,7 +49,7 @@ jobs:
           export KUBECONFIG=/home/runner/.kube/config
 
           tkn pipeline start deploy-multiple-services \
-            --serviceaccount=tekton-pipeline-role \
+            --serviceaccount=tekton-pipeline-sa \
             --param=BRANCH_ID=${{ env.BRANCH_ID }} \
             --param=NAMESPACE=${{ env.NAMESPACE }} \
             --param=GIT_REPO_URL=https://github.com/burakbalim \
