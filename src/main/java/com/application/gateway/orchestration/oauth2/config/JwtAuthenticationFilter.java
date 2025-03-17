@@ -71,6 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             OAuth2ErrorCodesResponseConverter.convert(response, exception);
             return;
         }
+        //TODO handle exceptions
         filterChain.doFilter(request, response);
     }
 
