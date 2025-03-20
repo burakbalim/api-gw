@@ -79,6 +79,8 @@ public class WebSecurityConfig {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+
     /**
      * The bean build oauth2ResourceServer with customization token endpoint that open new grant type for specification
      * HttpSecurity build for httpSecurity
@@ -123,7 +125,7 @@ public class WebSecurityConfig {
                                 requestMatchers(portalRequestMatcher).authenticated().
                                 requestMatchers(thirdPartyRequestMatcher).authenticated().
                                 anyRequest().permitAll()
-                ).
+                ).exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint)).
                 build();
     }
 

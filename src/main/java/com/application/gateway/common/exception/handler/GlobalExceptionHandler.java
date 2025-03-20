@@ -1,7 +1,9 @@
 package com.application.gateway.common.exception.handler;
 
+import com.application.gateway.common.ErrorResponse;
 import com.application.gateway.common.exception.*;
 import com.application.gateway.orchestration.oauth2.exception.ClientUnauthorizedException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @ControllerAdvice
@@ -21,12 +24,8 @@ public class GlobalExceptionHandler {
 
     @ResponseBody
     @ExceptionHandler(UnauthorizedException.class)
-    public final ResponseEntity<StandardErrorResponse> handleAllApiExceptions(UnauthorizedException ex) {
-        log.error("[UnauthorizedException] requested. Message: {}", ex.getMessage());
-        if (Objects.nonNull(ex.getCause())) {
-            log.error("", ex.getCause());;
-        }
-        return new ResponseEntity<>(new StandardErrorResponse("Unauthorized"), HttpStatus.UNAUTHORIZED);
+    public final ResponseEntity<ErrorResponse> handleAllApiExceptions(HttpServletRequest request, UnauthorizedException ex) {
+        return buildErrorResponse(ex, "invalid_user", HttpStatus.UNAUTHORIZED, request);
     }
 
     @ResponseBody
@@ -38,22 +37,20 @@ public class GlobalExceptionHandler {
 
     @ResponseBody
     @ExceptionHandler(ValidationException.class)
-    public final ResponseEntity<StandardErrorResponse> handleAllApiExceptions(ValidationException ex) {
-        return new ResponseEntity<>(new StandardErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
+    public final ResponseEntity<ErrorResponse> handleAllApiExceptions(HttpServletRequest request, ValidationException ex) {
+        return buildErrorResponse(ex, ex.getMessage(), HttpStatus.BAD_REQUEST, request);
     }
 
     @ResponseBody
     @ExceptionHandler(RateLimitExceedException.class)
-    public final ResponseEntity<StandardErrorResponse> handleAllApiExceptions(RateLimitExceedException ex) {
-        log.error("[RateLimitExceedException]", ex);
-        return new ResponseEntity<>(new StandardErrorResponse("Too many request"), HttpStatus.TOO_MANY_REQUESTS);
+    public final ResponseEntity<ErrorResponse> handleAllApiExceptions(HttpServletRequest request, RateLimitExceedException ex) {
+        return buildErrorResponse(ex, "too_many_request", HttpStatus.TOO_MANY_REQUESTS, request);
     }
 
     @ResponseBody
     @ExceptionHandler(BasicTokenUnauthorizedException.class)
-    public final ResponseEntity<StandardErrorResponse> handleAllApiExceptions(BasicTokenUnauthorizedException ex) {
-        log.error("[BasicTokenUnauthorizedException] requested. Message: {}", ex.getMessage());
-        return new ResponseEntity<>(new StandardErrorResponse("User not authorised"), HttpStatus.UNAUTHORIZED);
+    public final ResponseEntity<ErrorResponse> handleAllApiExceptions(HttpServletRequest request, BasicTokenUnauthorizedException ex) {
+        return buildErrorResponse(ex, "invalid_user", HttpStatus.UNAUTHORIZED, request);
     }
 
     /**
@@ -61,9 +58,8 @@ public class GlobalExceptionHandler {
      */
     @ResponseBody
     @ExceptionHandler(ClientTypeNotFoundException.class)
-    public final ResponseEntity<Void> handleAllApiExceptions(ClientTypeNotFoundException ex) {
-        log.error("[ClientTypeNotFoundException]", ex);
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public final ResponseEntity<ErrorResponse> handleAllApiExceptions(HttpServletRequest request, ClientTypeNotFoundException ex) {
+        return buildErrorResponse(ex, "client_type", HttpStatus.NOT_FOUND, request);
     }
 
     /**
@@ -71,15 +67,25 @@ public class GlobalExceptionHandler {
      */
     @ResponseBody
     @ExceptionHandler(RuntimeException.class)
-    public final ResponseEntity<Void> handleAllApiExceptions(RuntimeException ex) {
-        log.error("[RuntimeException]", ex);
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public final ResponseEntity<ErrorResponse> handleAllApiExceptions(HttpServletRequest request, RuntimeException ex) {
+        return buildErrorResponse(ex, "internal", HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
     @ResponseBody
     @ExceptionHandler(ApiGatewayException.class)
-    public final ResponseEntity<String> handleAllApiExceptions(ApiGatewayException ex) {
-        log.error("[ApiGatewayException]", ex);
-        return new ResponseEntity<>(ex.getMessage(), ex.getHttpStatus());
+    public final ResponseEntity<ErrorResponse> handleAllApiExceptions(HttpServletRequest request, ApiGatewayException ex) {
+        return buildErrorResponse(ex, ex.getMessage(), ex.getHttpStatus(), request);
+    }
+
+    private static ResponseEntity<ErrorResponse> buildErrorResponse(Exception ex, String message, HttpStatus status, HttpServletRequest request) {
+        log.error("Exception: {} | Path: {}", ex.getMessage(), request.getRequestURI(), ex);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(status.value())
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.status(status).body(errorResponse);
     }
 }

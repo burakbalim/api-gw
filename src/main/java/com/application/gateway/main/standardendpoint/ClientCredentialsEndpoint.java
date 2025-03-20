@@ -17,6 +17,10 @@ import org.springframework.stereotype.Component;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
+/**
+ * Represents the third-party client credentials endpoint.
+ * This endpoint can be utilized through the {<code>virtual_endpoints.json</code>} configuration.
+ */
 @RequiredArgsConstructor
 @Component("clientCredentials")
 @Slf4j

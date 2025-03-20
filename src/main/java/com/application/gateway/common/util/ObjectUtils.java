@@ -1,10 +1,12 @@
 package com.application.gateway.common.util;
 
+import com.application.gateway.common.ErrorResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +62,14 @@ public class ObjectUtils {
     public static <T> T readValue(String str, TypeReference<T> clazz) {
         try {
             return OBJECT_MAPPER.readValue(str, clazz);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void writeValue(HttpServletResponse response, ErrorResponse message) {
+        try {
+            OBJECT_MAPPER.writeValue(response.getWriter(), message);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
