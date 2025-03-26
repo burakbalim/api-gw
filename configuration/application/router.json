@@ -2,7 +2,7 @@
   "services": [
     {
       "service_name": "user-resource-service",
-      "service_url": "http://localhost:8091",
+      "service_url": "http://user-resource-service.staging.svc.cluster.local",
       "access_client": [
         "THIRD_PARTY",
         "WEB_PAGE",

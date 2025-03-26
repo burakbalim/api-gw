@@ -19,7 +19,6 @@ import java.util.Objects;
 @ControllerAdvice
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(value = "error.response", havingValue = "STANDARD")
 public class GlobalExceptionHandler {
 
     @ResponseBody

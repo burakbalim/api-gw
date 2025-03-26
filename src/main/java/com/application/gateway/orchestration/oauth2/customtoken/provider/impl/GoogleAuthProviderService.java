@@ -1,5 +1,6 @@
 package com.application.gateway.orchestration.oauth2.customtoken.provider.impl;
 
+import com.application.gateway.common.exception.UnauthorizedException;
 import com.application.gateway.orchestration.oauth2.customtoken.CustomAuthorizationGrantType;
 import com.application.gateway.orchestration.oauth2.customtoken.UserResourceService;
 import com.application.gateway.orchestration.oauth2.customtoken.provider.CustomAuthProviderBase;
@@ -63,10 +64,10 @@ public class GoogleAuthProviderService extends CustomAuthProviderBase {
             if (idToken != null) {
                 return idToken.getPayload();
             } else {
-                throw new RuntimeException("Invalid ID token.");
+                throw new UnauthorizedException("Invalid ID token.");
             }
         } catch (GeneralSecurityException | IOException e) {
-            throw new RuntimeException("Error verifying Google token: " + e.getMessage(), e);
+            throw new UnauthorizedException("Error verifying Google token: " + e.getMessage(), e);
         }
     }
 }

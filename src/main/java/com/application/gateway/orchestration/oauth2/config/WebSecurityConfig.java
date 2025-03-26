@@ -28,8 +28,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2Token;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
@@ -49,14 +49,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
-import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REFRESH_TOKEN;
 
 /**
  * Perform OAuth2 mechanism settings
@@ -237,10 +237,23 @@ public class WebSecurityConfig {
             if (Objects.isNull(registeredClient)) {
                 return;
             }
-            Set<String> authorities = new HashSet<>(registeredClient.getScopes());
             if (context.getTokenType().getValue().equals(ACCESS_TOKEN)) {
-                context.getClaims().claim("authorities", authorities);
-                addForRefreshToken(context, principal, registeredClient);
+                Set<String> roles = registeredClient.getScopes().stream()
+                        .filter(scope -> scope.startsWith("ROLE_"))
+                        .collect(Collectors.toSet());
+                JwtClaimsSet.Builder claims = context.getClaims();
+                claims.claim("authorities", roles);
+
+                if (principal.getDetails() instanceof User user) {
+                    claims.claims(claimsList -> {
+                        Optional.ofNullable(user.getUsername()).ifPresent(value -> claimsList.put("username", value));
+                        Optional.ofNullable(user.getId()).ifPresent(value -> claimsList.put("id", value));
+                        Optional.ofNullable(user.getEmail()).ifPresent(value -> claimsList.put("email", value));
+                        Optional.ofNullable(user.getAuthProvider()).ifPresent(value -> claimsList.put("auth_provider", value));
+                        Optional.ofNullable(user.getBirthDate()).ifPresent(value -> claimsList.put("birth_date", value));
+                        Optional.ofNullable(user.getExternalId()).ifPresent(value -> claimsList.put("external_id", value));
+                    });
+                }
             }
         };
     }
@@ -262,15 +275,8 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-
-    private void addForRefreshToken(JwtEncodingContext context, OAuth2ClientAuthenticationToken principal, RegisteredClient registeredClient) {
-        if (registeredClient.getAuthorizationGrantTypes().contains(new AuthorizationGrantType(REFRESH_TOKEN))) {
-            User user = (User) principal.getDetails();
-            if (Objects.nonNull(user.getUsername())) {
-                context.getClaims().claim("username", user.getUsername());
-                context.getClaims().claim("registered_client_id", registeredClient.getClientId());
-            }
-        }
-    }
 }
+/*
+
+{"access_token":"eyJraWQiOiJiMTZjNDI2My00NDUwLTRmYTctYTA0YS0wZjkyYWEyNTU5YzciLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI2YmQ5MDc2Zi0wZGJmLTQ0ODItYWVmMS1kMTA4ZmNiNDAxYTYiLCJhdWQiOiI2YmQ5MDc2Zi0wZGJmLTQ0ODItYWVmMS1kMTA4ZmNiNDAxYTYiLCJuYmYiOjE3NDI4NDI1NjIsImlzcyI6Ii9vYXV0aDIvdG9rZW4iLCJleHAiOjE3NDI4NDYxNjIsImlhdCI6MTc0Mjg0MjU2MiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl19.CXUHKeO6X2x-txWbKh7z0FOle2Hc7XYD4_BscdThrBZel4utr9Zbmj72E6XjMxTT5X8lGRxhLoqOCPZNV7CzOXJdMgJsyhXzxt5obgIYo8CrCsDKxCT3OIerVkd-QerkYaif2y-1BaXsRkpqb9pRV0Zb11dwtTCumWItg6eVZmCxqpRgS7LZH7fg0Zx1tTjFgqKSSJGhQOXJiQHeOTqyQ8pz1eQKHMwRu5XRuPo_D-0Cf8xKBjgyw0FRpIchPioeV4rLWJTtqFj_s8eoNRMAOmcYzENC-8hCMpLiLgWGcKLsNC5JEYSdhN5bDDNuVFnpnYTOfAz89zUjx9KPt--aRA","refresh_token":"JUJUA7e2ohMFjo1rPKDBVVtwIk60nO8qf1xyKTKC_5L-madRk8dTJZHVv0Uj1p1KO-OBJMg7fj_E34Qzqbo__m6jlMEJH7HFl87qecUQbOQcNn-7wAI2o9rnuIzhOReJ","token_type":"Bearer","expires_in":3599}
+ */

@@ -16,7 +16,7 @@
       "client_secret": "tKESWwwFCnVWFjyF2kDDQf8AiGQq9q627HTB6l6N",
       "access_token_exp": 60,
       "refresh_token_exp": 600,
-      "scopes": ["email"]
+      "scopes": ["ROLE_USER"]
     }
   ]
 }

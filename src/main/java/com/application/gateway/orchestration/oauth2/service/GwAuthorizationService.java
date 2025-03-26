@@ -65,7 +65,7 @@ public class GwAuthorizationService {
                 .attribute(Principal.class.getName(), clientPrincipal)
                 .principalName(clientPrincipal.getName())
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .authorizedScopes(Collections.emptySet())
+                .authorizedScopes(registeredClient.getScopes())
                 .refreshToken(refreshToken)
                 .accessToken(accessToken);
 

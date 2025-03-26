@@ -19,6 +19,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class User {
 
+    @JsonProperty("id")
+    private Long id;
+
     @JsonProperty("username")
     private String username;
 
@@ -40,4 +43,5 @@ public class User {
     public User(String username) {
         this.username = username;
     }
+
 }
