@@ -101,7 +101,7 @@ public class Oauth2ConfigProviderImpl extends ConfigurableBase<OAuth2Configurati
             tokenSettingBuilder.accessTokenTimeToLive(Duration.ofMinutes(clientConfiguration.getAccessTokenExp()));
         }
         if (Objects.nonNull(clientConfiguration.getRefreshTokenExp())) {
-            tokenSettingBuilder.refreshTokenTimeToLive(Duration.ofMinutes(clientConfiguration.getRefreshTokenExp()));
+            tokenSettingBuilder.refreshTokenTimeToLive(Duration.ofDays(clientConfiguration.getRefreshTokenExp()));
         }
 
         RegisteredClient.Builder builder = RegisteredClient.withId(clientConfiguration.getName());

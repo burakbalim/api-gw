@@ -1,5 +1,6 @@
-package com.application.gateway.orchestration.common.util.filewatcher;
+package com.application.gateway.orchestration.common.util.watcher.impl;
 
+import com.application.gateway.orchestration.common.util.watcher.ConfigurationWatcherBase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,8 @@
-package com.application.gateway.orchestration.common.util.filewatcher;
+package com.application.gateway.orchestration.common.util.watcher.impl;
 
 
 import com.application.gateway.orchestration.common.dto.ConfigurationSourceDTO;
+import com.application.gateway.orchestration.common.util.watcher.ConfigurationWatcherBase;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.changestream.ChangeStreamDocument;

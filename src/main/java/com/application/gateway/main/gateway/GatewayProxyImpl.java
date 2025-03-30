@@ -15,11 +15,11 @@ import com.application.gateway.main.router.dto.RouterDTO;
 import com.application.gateway.main.virtualendpoints.VirtualEndpointProviderImpl;
 import com.application.gateway.main.virtualendpoints.dto.VirtualEndpointDTOCollections;
 import com.application.gateway.orchestration.common.dto.ConfigurationSourceDTO;
+import com.application.gateway.orchestration.common.util.watcher.ConfigWatcher;
 import com.application.gateway.orchestration.logger.Logger;
 import com.application.gateway.orchestration.logger.LoggerConfiguration;
 import com.application.gateway.orchestration.oauth2.model.OAuth2ConfigurationList;
 import com.application.gateway.orchestration.oauth2.provider.Oauth2ConfigProviderImpl;
-import com.application.gateway.orchestration.common.util.filewatcher.ConfigWatcher;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

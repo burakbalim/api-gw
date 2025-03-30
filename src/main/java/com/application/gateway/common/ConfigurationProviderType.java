@@ -5,7 +5,8 @@ import java.util.function.Supplier;
 public enum ConfigurationProviderType {
 
     FILE,
-    MONGO;
+    MONGO,
+    POSTGRES;
 
     private static final String GW = "gw_";
     private static final String JSON = ".json";
@@ -14,6 +15,7 @@ public enum ConfigurationProviderType {
         return switch (type) {
             case FILE -> supplier.get() + JSON;
             case MONGO -> GW + supplier.get();
+            case POSTGRES -> GW + supplier.get();
         };
     }
 }

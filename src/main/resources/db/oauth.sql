@@ -50,3 +50,13 @@ CREATE EVENT oauth2_authorization_delete_expired_data
     DO
     DELETE FROM oauth2_authorization WHERE refresh_token_expires_at <= CONVERT_TZ(NOW(), 'UTC', 'Asia/Dubai');
 DELETE FROM oauth2_authorization WHERE oauth2_authorization.access_token_expires_at <= CONVERT_TZ(NOW(), 'UTC', 'Asia/Dubai');
+
+
+-- For postgres configuration watcher
+
+CREATE OR REPLACE FUNCTION notify_table_change() RETURNS TRIGGER AS $$
+BEGIN
+    PERFORM pg_notify('table_changes', row_to_json(NEW)::text);
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;

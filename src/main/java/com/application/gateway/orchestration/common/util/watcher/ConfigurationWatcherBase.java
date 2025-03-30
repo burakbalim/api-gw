@@ -1,4 +1,4 @@
-package com.application.gateway.orchestration.common.util.filewatcher;
+package com.application.gateway.orchestration.common.util.watcher;
 
 import com.application.gateway.orchestration.Configurable;
 import com.application.gateway.orchestration.ConfigurationBaseDTO;

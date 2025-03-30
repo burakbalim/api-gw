@@ -3,7 +3,7 @@ package com.application.gateway.unit.orchestration.common.util.filewatcher;
 import com.application.gateway.orchestration.Configurable;
 import com.application.gateway.orchestration.ConfigurationBaseDTO;
 import com.application.gateway.orchestration.common.dto.ConfigurationSourceDTO;
-import com.application.gateway.orchestration.common.util.filewatcher.ConfigurationWatcherBase;
+import com.application.gateway.orchestration.common.util.watcher.ConfigurationWatcherBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -125,7 +125,7 @@ class ConfigurationWatcherBaseTest {
         // given
         ConfigurationSourceDTO<TestConfig> sourceDTO = new ConfigurationSourceDTO<>();
         sourceDTO.setName("test-config");
-        
+
         Configurable<TestConfig> configurable2 = mock(Configurable.class);
 
         // when
@@ -145,4 +145,4 @@ class ConfigurationWatcherBaseTest {
             throw new RuntimeException(e);
         }
     }
-} 
+}

@@ -37,8 +37,8 @@ public class ClientConfiguration implements Serializable {
     @Field("access_token_exp")
     private Integer accessTokenExp;
 
-    @JsonProperty("refresh_token_exp")
-    @Field("refresh_token_exp")
+    @JsonProperty("refresh_token_exp_day")
+    @Field("refresh_token_exp_day")
     private Integer refreshTokenExp;
 
     @JsonProperty("scopes")
