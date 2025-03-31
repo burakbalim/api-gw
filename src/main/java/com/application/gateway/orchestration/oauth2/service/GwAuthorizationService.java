@@ -51,16 +51,16 @@ public class GwAuthorizationService {
 
         OAuth2ClientAuthenticationToken clientPrincipal = OauthUtils.getAuthenticatedClientElseThrowInvalidClient(SecurityContextHolder.getContext().getAuthentication());
 
+        assert registeredClient != null;
         DefaultOAuth2TokenContext.Builder authTokenContext = DefaultOAuth2TokenContext.builder().registeredClient(registeredClient)
                 .principal(clientPrincipal)
                 .authorizationServerContext(AuthorizationServerContextHolder.getContext())
-                .authorizedScopes(new HashSet<>())
+                .authorizedScopes(registeredClient.getScopes())
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN);
 
         OAuth2AccessToken accessToken = (OAuth2AccessToken) generateToken(authTokenContext, OAuth2TokenType.ACCESS_TOKEN);
         OAuth2RefreshToken refreshToken = (OAuth2RefreshToken) generateToken(authTokenContext, OAuth2TokenType.REFRESH_TOKEN);
 
-        assert registeredClient != null;
         OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.withRegisteredClient(registeredClient)
                 .attribute(Principal.class.getName(), clientPrincipal)
                 .principalName(clientPrincipal.getName())

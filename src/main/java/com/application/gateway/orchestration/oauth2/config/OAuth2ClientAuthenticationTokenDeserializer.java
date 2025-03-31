@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -53,11 +54,14 @@ public class OAuth2ClientAuthenticationTokenDeserializer extends JsonDeserialize
                 .clientSecret(getValue(registeredClientJsonNode.get("client_secret")))
                 .clientSecretExpiresAt(clientSecretExpiresAt)
                 .clientName(getValue(registeredClientJsonNode.get("client_name")))
+                .scopes((set) -> {
+                    set.addAll(getCollectionValue(registeredClientJsonNode.get("scopes")));
+                })
+                .authorizationGrantTypes((grantTypes) ->
+                        authorizationGrantTypes.forEach(grantType -> grantTypes.add(resolveAuthorizationGrantType(grantType.getValue()))));
                 /*.clientAuthenticationMethods((authenticationMethods) ->
                         clientAuthenticationMethods.forEach(authenticationMethod ->
                                 authenticationMethods.add(resolveClientAuthenticationMethod(authenticationMethod))))*/
-                .authorizationGrantTypes((grantTypes) ->
-                        authorizationGrantTypes.forEach(grantType -> grantTypes.add(resolveAuthorizationGrantType(grantType.getValue()))));
                 /*.redirectUris((uris) -> uris.addAll(redirectUris))
                 .postLogoutRedirectUris((uris) -> uris.addAll(postLogoutRedirectUris))
                 .scopes((scopes) -> scopes.addAll(clientScopes));*/
@@ -67,6 +71,20 @@ public class OAuth2ClientAuthenticationTokenDeserializer extends JsonDeserialize
         OAuth2ClientAuthenticationToken oAuth2ClientAuthenticationToken = new OAuth2ClientAuthenticationToken(builder.build(), clientAuthenticationMethod, null);
         oAuth2ClientAuthenticationToken.setDetails(details);
         return oAuth2ClientAuthenticationToken;
+    }
+
+    private Collection<String> getCollectionValue(JsonNode values) {
+        List<String> scopes = new ArrayList<>();
+        if (values != null && values.isArray()) {
+            for (JsonNode node : values) {
+                if (node.isArray()) {
+                    for (JsonNode scope : node) {
+                        scopes.add(scope.asText());
+                    }
+                }
+            }
+        }
+        return scopes;
     }
 
     private String getValue(Object object) {
