@@ -1,4 +1,4 @@
-package com.application.gateway.orchestration.oauth2;
+package com.application.gateway.orchestration.oauth2.config.mixin;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public abstract class UserDTOMixin {
 
     @JsonCreator
-    UserDTOMixin(@JsonProperty("id") String id,
+    UserDTOMixin(@JsonProperty("id") Long id,
                  @JsonProperty("username") String username,
                  @JsonProperty("email") String email,
                  @JsonProperty("auth_provider") String authProvider,
@@ -21,5 +21,4 @@ public abstract class UserDTOMixin {
     ) {
 
     }
-
 }

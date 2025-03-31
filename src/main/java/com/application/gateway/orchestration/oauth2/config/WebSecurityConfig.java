@@ -5,6 +5,8 @@ import com.application.gateway.orchestration.oauth2.config.matchers.AllowedPaths
 import com.application.gateway.orchestration.oauth2.config.matchers.AppRequestMatcher;
 import com.application.gateway.orchestration.oauth2.config.matchers.PortalRequestMatcher;
 import com.application.gateway.orchestration.oauth2.config.matchers.ThirdPartyRequestMatcher;
+import com.application.gateway.orchestration.oauth2.config.mixin.LongMixin;
+import com.application.gateway.orchestration.oauth2.config.mixin.UserDTOMixin;
 import com.application.gateway.orchestration.oauth2.customtoken.CustomAuthenticationConverter;
 import com.application.gateway.orchestration.oauth2.customtoken.CustomAuthenticationProvider;
 import com.application.gateway.orchestration.oauth2.model.User;
@@ -199,6 +201,7 @@ public class WebSecurityConfig {
         objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
         objectMapper.addMixIn(OAuth2ClientAuthenticationToken.class, OAuth2ClientAuthenticationTokenMixin.class);
         objectMapper.addMixIn(User.class, UserDTOMixin.class);
+        objectMapper.addMixIn(Long.class, LongMixin.class);
 
         rowMapper.setObjectMapper(objectMapper);
         oAuth2AuthorizationParametersMapper.setObjectMapper(objectMapper);
