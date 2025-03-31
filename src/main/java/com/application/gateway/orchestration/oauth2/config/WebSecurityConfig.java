@@ -57,6 +57,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REFRESH_TOKEN;
 
 /**
  * Perform OAuth2 mechanism settings
@@ -237,7 +238,7 @@ public class WebSecurityConfig {
             if (Objects.isNull(registeredClient)) {
                 return;
             }
-            if (context.getTokenType().getValue().equals(ACCESS_TOKEN)) {
+            if (ACCESS_TOKEN.equals(context.getTokenType().getValue()) || REFRESH_TOKEN.equals(context.getTokenType().getValue())) {
                 Set<String> roles = registeredClient.getScopes().stream()
                         .filter(scope -> scope.startsWith("ROLE_"))
                         .collect(Collectors.toSet());
@@ -276,7 +277,3 @@ public class WebSecurityConfig {
         return source;
     }
 }
-/*
-
-{"access_token":"eyJraWQiOiJiMTZjNDI2My00NDUwLTRmYTctYTA0YS0wZjkyYWEyNTU5YzciLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI2YmQ5MDc2Zi0wZGJmLTQ0ODItYWVmMS1kMTA4ZmNiNDAxYTYiLCJhdWQiOiI2YmQ5MDc2Zi0wZGJmLTQ0ODItYWVmMS1kMTA4ZmNiNDAxYTYiLCJuYmYiOjE3NDI4NDI1NjIsImlzcyI6Ii9vYXV0aDIvdG9rZW4iLCJleHAiOjE3NDI4NDYxNjIsImlhdCI6MTc0Mjg0MjU2MiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl19.CXUHKeO6X2x-txWbKh7z0FOle2Hc7XYD4_BscdThrBZel4utr9Zbmj72E6XjMxTT5X8lGRxhLoqOCPZNV7CzOXJdMgJsyhXzxt5obgIYo8CrCsDKxCT3OIerVkd-QerkYaif2y-1BaXsRkpqb9pRV0Zb11dwtTCumWItg6eVZmCxqpRgS7LZH7fg0Zx1tTjFgqKSSJGhQOXJiQHeOTqyQ8pz1eQKHMwRu5XRuPo_D-0Cf8xKBjgyw0FRpIchPioeV4rLWJTtqFj_s8eoNRMAOmcYzENC-8hCMpLiLgWGcKLsNC5JEYSdhN5bDDNuVFnpnYTOfAz89zUjx9KPt--aRA","refresh_token":"JUJUA7e2ohMFjo1rPKDBVVtwIk60nO8qf1xyKTKC_5L-madRk8dTJZHVv0Uj1p1KO-OBJMg7fj_E34Qzqbo__m6jlMEJH7HFl87qecUQbOQcNn-7wAI2o9rnuIzhOReJ","token_type":"Bearer","expires_in":3599}
- */
