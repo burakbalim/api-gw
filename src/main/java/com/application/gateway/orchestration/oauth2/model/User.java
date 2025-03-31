@@ -35,6 +35,7 @@ public class User {
     private String externalId; // External provider user ID
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonProperty("birth_date")
     private LocalDate birthDate;
 
     @JsonProperty("password")

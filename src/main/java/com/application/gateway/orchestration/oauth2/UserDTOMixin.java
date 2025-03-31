@@ -12,13 +12,14 @@ import java.time.LocalDate;
 public abstract class UserDTOMixin {
 
     @JsonCreator
-    UserDTOMixin(@JsonProperty("username") String username,
+    UserDTOMixin(@JsonProperty("id") String id,
+                 @JsonProperty("username") String username,
                  @JsonProperty("email") String email,
-                 @JsonProperty("password") String password,
-                 @JsonProperty("authProvider") String authProvider,
-                 @JsonProperty("externalId") String externalId,
-                 @JsonProperty("birthDate") LocalDate birthDate
+                 @JsonProperty("auth_provider") String authProvider,
+                 @JsonProperty("external_id") String externalId,
+                 @JsonProperty("birth_date") LocalDate birthDate
     ) {
 
     }
+
 }
