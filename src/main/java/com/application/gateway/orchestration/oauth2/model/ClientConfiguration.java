@@ -33,12 +33,12 @@ public class ClientConfiguration implements Serializable {
     @Field("client_secret")
     private String clientSecret;
 
-    @JsonProperty("access_token")
-    @Field("access_token")
+    @JsonProperty("access_token_exp")
+    @Field("access_token_exp")
     private TokenUnit accessTokenExp;
 
-    @JsonProperty("refresh_token")
-    @Field("refresh_token")
+    @JsonProperty("refresh_token_exp")
+    @Field("refresh_token_exp")
     private TokenUnit refreshTokenExp;
 
     @JsonProperty("scopes")
@@ -52,4 +52,8 @@ public class ClientConfiguration implements Serializable {
     @JsonProperty("authorization_uri")
     @Field("authorization_uri")
     private String authorizationUri;
+
+    @JsonProperty("reuse_refresh_token")
+    @Field("reuse_refresh_token")
+    private boolean reuseRefreshToken;
 }

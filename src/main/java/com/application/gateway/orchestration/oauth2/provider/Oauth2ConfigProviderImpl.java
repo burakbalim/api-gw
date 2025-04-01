@@ -5,7 +5,6 @@ import com.application.gateway.orchestration.ConfigurableBase;
 import com.application.gateway.orchestration.common.dto.ConfigurationSourceDTO;
 import com.application.gateway.orchestration.common.repository.ConfigurationProvider;
 import com.application.gateway.orchestration.oauth2.config.matchers.RequestMatcherBase;
-import com.application.gateway.orchestration.oauth2.customtoken.CustomAuthorizationGrantType;
 import com.application.gateway.orchestration.oauth2.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -17,7 +16,6 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.stereotype.Component;
 
 import java.security.Principal;
-import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -96,22 +94,9 @@ public class Oauth2ConfigProviderImpl extends ConfigurableBase<OAuth2Configurati
     }
 
     private RegisteredClient getRegisteredClient(ClientConfiguration clientConfiguration) {
-        TokenSettings.Builder tokenSettingBuilder = TokenSettings.builder();
-        TokenUnit accessTokenUnit = clientConfiguration.getAccessTokenExp();
-        TokenUnit refreshTokenUnit = clientConfiguration.getRefreshTokenExp();
-        if (Objects.nonNull(accessTokenUnit)) {
-            tokenSettingBuilder.accessTokenTimeToLive(accessTokenUnit.toDuration());
-        }
-        if (Objects.nonNull(refreshTokenUnit)) {
-            tokenSettingBuilder.refreshTokenTimeToLive(refreshTokenUnit.toDuration());
-        }
+        TokenSettings tokenSettings = getTokenSettingBuilder(clientConfiguration);
 
-        RegisteredClient.Builder builder = RegisteredClient.withId(clientConfiguration.getName());
-        if (clientConfiguration.getGrantType().contains(AuthorizationGrantType.REFRESH_TOKEN.getValue())) {
-            builder.authorizationGrantType(CustomAuthorizationGrantType.CUSTOM_PASSWORD);
-        }
-
-        return builder
+        return RegisteredClient.withId(clientConfiguration.getName())
                 .clientName(clientConfiguration.getName())
                 .clientId(clientConfiguration.getClientId())
                 .clientSecret(clientConfiguration.getClientSecret())
@@ -122,8 +107,21 @@ public class Oauth2ConfigProviderImpl extends ConfigurableBase<OAuth2Configurati
                 .scope(clientConfiguration.getClientType().getRole())
                 .scopes(scopes -> scopes.addAll(clientConfiguration.getScopes()))
                 //.redirectUris(uris -> uris.addAll(clientConfiguration.getRedirectUris()))
-                .tokenSettings(tokenSettingBuilder.build())
+                .tokenSettings(tokenSettings)
                 .build();
     }
 
+    private static TokenSettings getTokenSettingBuilder(ClientConfiguration clientConfiguration) {
+        TokenSettings.Builder tokenSettingBuilder = TokenSettings.builder();
+        TokenUnit accessTokenUnit = clientConfiguration.getAccessTokenExp();
+        TokenUnit refreshTokenUnit = clientConfiguration.getRefreshTokenExp();
+        if (Objects.nonNull(accessTokenUnit)) {
+            tokenSettingBuilder.accessTokenTimeToLive(accessTokenUnit.toDuration());
+        }
+        if (Objects.nonNull(refreshTokenUnit)) {
+            tokenSettingBuilder.refreshTokenTimeToLive(refreshTokenUnit.toDuration());
+        }
+        tokenSettingBuilder.reuseRefreshTokens(clientConfiguration.isReuseRefreshToken());
+        return tokenSettingBuilder.build();
+    }
 }

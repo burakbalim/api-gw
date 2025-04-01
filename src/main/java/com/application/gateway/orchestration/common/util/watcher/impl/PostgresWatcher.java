@@ -12,7 +12,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.*;
 
 @Slf4j
 @Service
@@ -44,18 +51,73 @@ public class PostgresWatcher extends ConfigurationWatcherBase {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private Connection connection;
+    private final static ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newScheduledThreadPool(1);
+    private final Set<String> listenedTables = new HashSet<>();
+
     @Override
     protected void onInit() {
         pathToServiceMap.forEach((configurationSourceDTO, configurable) -> setup(configurationSourceDTO.getConfigurationSource()));
+        pathToServiceMap.forEach((configurationSourceDTO, configurable) -> listenedTables.add(configurationSourceDTO.getName()));
+        initializeListener();
     }
 
-    @Scheduled(cron = "0 */1 * * * *")
-    @Override
-    protected void onListen() {
-        pathToServiceMap.forEach((configurationSourceDTO, configurable) -> {
-            createNotificationHandler(configurationSourceDTO);
-        });
+
+    private void initializeListener() {
+        try {
+            DataSource dataSource = jdbcTemplate.getDataSource();
+            if (dataSource == null) {
+                throw new IllegalStateException("DataSource is not available");
+            }
+
+            if (connection == null || connection.isClosed()) {
+                connection = dataSource.getConnection();
+                connection.setAutoCommit(false);
+                log.info("Database connection established for LISTEN.");
+            }
+
+            for (String table : listenedTables) {
+                connection.createStatement().execute("LISTEN " + table);
+                log.info("Listening to table: {}", table);
+            }
+        } catch (Exception e) {
+            log.error("Error initializing LISTEN connection", e);
+        }
     }
+
+    @Override
+    public void onListen() {
+        SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(this::listen, 1, 10, TimeUnit.MINUTES);
+    }
+
+    private void listen() {
+        try {
+            PGConnection pgConnection = connection.unwrap(PGConnection.class);
+            PGNotification[] notifications = pgConnection.getNotifications();
+            if (notifications != null) {
+                for (PGNotification notification : notifications) {
+                    log.info("Received notification from {}: {}", notification.getName(), notification.getParameter());
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error checking notifications", e);
+            restartListening();
+        }
+    }
+
+    private void restartListening() {
+        log.warn("Restarting LISTEN connection...");
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            log.error("Error closing connection", e);
+        }
+
+        initializeListener();
+    }
+
 
     private void setup(String configurationSource) {
         String triggerFunction = String.format(TRIGGER_TEMPLATE, configurationSource, configurationSource);
@@ -72,28 +134,7 @@ public class PostgresWatcher extends ConfigurationWatcherBase {
         }
     }
 
-    public void createNotificationHandler(ConfigurationSourceDTO<?> configurationSourceDTO) {
-        try {
-            jdbcTemplate.execute((Connection c) -> {
-                c.setAutoCommit(false);
-                String tableName = configurationSourceDTO.getConfigurationSource();
-                log.info("Listening table {}", tableName);
-                c.createStatement().execute("LISTEN " + tableName);
-                PGConnection pgconn = c.unwrap(PGConnection.class);
-                PGNotification[] nts = pgconn.getNotifications(1000);
-                if (nts == null || nts.length == 0) {
-                    return 0;
-                }
-                log.info("Something changed on {}", tableName);
-                notifyToSubscriber(configurationSourceDTO.getName());
-                return 0;
-            });
-        } catch (Exception e) {
-            log.error("Occurred exception on listening {}", configurationSourceDTO.getConfigurationSource(), e);
-        }
-    }
-
-    public boolean functionExists(String functionName) {
+    private boolean functionExists(String functionName) {
         String sql = "SELECT COUNT(*) FROM pg_proc WHERE proname = ?";
         Integer count = jdbcTemplate.queryForObject(
                 sql,
@@ -103,7 +144,7 @@ public class PostgresWatcher extends ConfigurationWatcherBase {
         return count != null && count > 0;
     }
 
-    public boolean triggerExists(String triggerName) {
+    private boolean triggerExists(String triggerName) {
         String sql = "SELECT COUNT(*) FROM pg_trigger WHERE tgname = ?";
         Integer count = jdbcTemplate.queryForObject(
                 sql,
