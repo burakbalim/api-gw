@@ -1,6 +1,7 @@
 package com.application.gateway.orchestration.common.util;
 
 import com.application.gateway.common.ErrorResponse;
+import com.application.gateway.common.exception.UnauthorizedException;
 import com.application.gateway.common.util.ObjectUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,10 +25,10 @@ public class OAuth2ErrorCodesResponseConverter {
     private OAuth2ErrorCodesResponseConverter() {
     }
 
-    public static void convert(HttpServletResponse response, AuthenticationException exception) {
+    public static void convert(HttpServletResponse response, Exception exception) {
         String message = convertMessage(exception);
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.FORBIDDEN.value())
+                .status(HttpStatus.UNAUTHORIZED.value())
                 .message(message)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -35,11 +36,11 @@ public class OAuth2ErrorCodesResponseConverter {
         log.error("OAuth2 Error: {} | Exception: {}", message, exception.getMessage(), exception);
 
         response.setContentType("application/json");
-        response.setStatus(HttpStatus.FORBIDDEN.value());
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         ObjectUtils.writeValue(response, errorResponse);
     }
 
-    private static String convertMessage(AuthenticationException exception) {
+    private static String convertMessage(Exception exception) {
         if (exception.getCause() instanceof JwtValidationException jwtValidationException) {
             List<String> errors = jwtValidationException.getErrors()
                     .stream()

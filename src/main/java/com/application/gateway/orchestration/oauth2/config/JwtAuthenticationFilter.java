@@ -1,5 +1,6 @@
 package com.application.gateway.orchestration.oauth2.config;
 
+import com.application.gateway.common.exception.UnauthorizedException;
 import com.application.gateway.common.properties.AuthProperties;
 import com.application.gateway.common.util.PathUtils;
 import jakarta.servlet.FilterChain;
@@ -66,13 +67,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             checkOauth(request, response);
+            filterChain.doFilter(request, response);
         }
-        catch (AuthenticationException exception) {
+        catch (AuthenticationException | UnauthorizedException exception) {
             OAuth2ErrorCodesResponseConverter.convert(response, exception);
-            return;
         }
-        //TODO handle exceptions
-        filterChain.doFilter(request, response);
     }
 
     private void checkOauth(HttpServletRequest request, HttpServletResponse response) {

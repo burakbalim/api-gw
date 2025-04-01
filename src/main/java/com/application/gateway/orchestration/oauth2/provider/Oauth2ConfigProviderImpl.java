@@ -97,11 +97,13 @@ public class Oauth2ConfigProviderImpl extends ConfigurableBase<OAuth2Configurati
 
     private RegisteredClient getRegisteredClient(ClientConfiguration clientConfiguration) {
         TokenSettings.Builder tokenSettingBuilder = TokenSettings.builder();
-        if (Objects.nonNull(clientConfiguration.getAccessTokenExp())) {
-            tokenSettingBuilder.accessTokenTimeToLive(Duration.ofMinutes(clientConfiguration.getAccessTokenExp()));
+        TokenUnit accessTokenUnit = clientConfiguration.getAccessTokenExp();
+        TokenUnit refreshTokenUnit = clientConfiguration.getRefreshTokenExp();
+        if (Objects.nonNull(accessTokenUnit)) {
+            tokenSettingBuilder.accessTokenTimeToLive(accessTokenUnit.toDuration());
         }
-        if (Objects.nonNull(clientConfiguration.getRefreshTokenExp())) {
-            tokenSettingBuilder.refreshTokenTimeToLive(Duration.ofDays(clientConfiguration.getRefreshTokenExp()));
+        if (Objects.nonNull(refreshTokenUnit)) {
+            tokenSettingBuilder.refreshTokenTimeToLive(refreshTokenUnit.toDuration());
         }
 
         RegisteredClient.Builder builder = RegisteredClient.withId(clientConfiguration.getName());
@@ -123,4 +125,5 @@ public class Oauth2ConfigProviderImpl extends ConfigurableBase<OAuth2Configurati
                 .tokenSettings(tokenSettingBuilder.build())
                 .build();
     }
+
 }

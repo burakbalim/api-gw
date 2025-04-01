@@ -49,7 +49,7 @@ public class PostgresWatcher extends ConfigurationWatcherBase {
         pathToServiceMap.forEach((configurationSourceDTO, configurable) -> setup(configurationSourceDTO.getConfigurationSource()));
     }
 
-    @Scheduled(cron = "0 */10 * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     @Override
     protected void onListen() {
         pathToServiceMap.forEach((configurationSourceDTO, configurable) -> {
