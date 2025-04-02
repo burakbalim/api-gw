@@ -18,6 +18,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,6 +68,7 @@ import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterN
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
+@Slf4j
 @SuppressWarnings("deprecation")
 public class WebSecurityConfig {
 
@@ -242,6 +244,8 @@ public class WebSecurityConfig {
                 return;
             }
             if (ACCESS_TOKEN.equals(context.getTokenType().getValue()) || REFRESH_TOKEN.equals(context.getTokenType().getValue())) {
+                log.info("Token issued for grant: {}", context.getTokenType().getValue());
+
                 Set<String> roles = registeredClient.getScopes().stream()
                         .filter(scope -> scope.startsWith("ROLE_"))
                         .collect(Collectors.toSet());
