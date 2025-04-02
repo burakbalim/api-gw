@@ -244,7 +244,7 @@ public class WebSecurityConfig {
                 return;
             }
             if (ACCESS_TOKEN.equals(context.getTokenType().getValue()) || REFRESH_TOKEN.equals(context.getTokenType().getValue())) {
-                log.info("Token issued for grant: {}", context.getTokenType().getValue());
+                log.info("Token issued for grant: {}", context.getAuthorizationGrantType().getValue());
 
                 Set<String> roles = registeredClient.getScopes().stream()
                         .filter(scope -> scope.startsWith("ROLE_"))
