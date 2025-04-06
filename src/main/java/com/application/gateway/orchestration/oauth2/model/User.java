@@ -36,13 +36,14 @@ public class User {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonProperty("birth_date")
-    private LocalDate birthDate;
+    private String birthDate;
 
     @JsonProperty("password")
     private String password;
 
-    public User(String username) {
+    public User(String username, String authProvider) {
         this.username = username;
+        this.authProvider = authProvider;
     }
 
 }

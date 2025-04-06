@@ -48,16 +48,4 @@ public class EndpointDetector {
             return new UndefinedRequestInfo(request, clientType);
         }
     }
-
-    public String getAuthenticationType() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication instanceof JwtAuthenticationToken) {
-            return "access_token";  // Bearer Token ile gelmiş
-        } else if (authentication instanceof OAuth2ClientAuthenticationToken) {
-            return "client_credentials";  // Client Credentials ile gelmiş
-        }
-
-        return "unknown"; // Başka bir authentication tipi (örneğin Basic Auth veya anonim erişim)
-    }
 }

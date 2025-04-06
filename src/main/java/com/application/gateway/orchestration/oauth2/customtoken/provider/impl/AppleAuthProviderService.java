@@ -70,7 +70,6 @@ public class AppleAuthProviderService extends CustomAuthProviderBase {
         user.setExternalId(jwt.getSubject());
         user.setEmail(jwt.getClaim(EMAIL));
         user.setUsername(usernameParser(jwt.getClaim("email")));
-        //user.setBirthDate();
         return user;
     }
 

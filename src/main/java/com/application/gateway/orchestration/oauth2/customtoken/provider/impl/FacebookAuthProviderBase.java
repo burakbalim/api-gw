@@ -52,7 +52,7 @@ public class FacebookAuthProviderBase extends CustomAuthProviderBase {
         ouath2User.setExternalId(user.getId());
         ouath2User.setPassword(null);
         if (Objects.nonNull(user.getBirthdayAsDate())) {
-            ouath2User.setBirthDate(LocalDateUtils.converToLocalDate(user.getBirthdayAsDate()));
+            ouath2User.setBirthDate(user.getBirthdayAsDate().toString());
         }
         return ouath2User;
     }

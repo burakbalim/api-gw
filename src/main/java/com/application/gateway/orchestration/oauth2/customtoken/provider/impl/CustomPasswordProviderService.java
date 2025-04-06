@@ -34,6 +34,6 @@ public class CustomPasswordProviderService extends CustomAuthProviderBase {
         if (!isValidUser) {
             throw new UnauthorizedException("User is not valid");
         }
-        return new User(username);
+        return new User(username, "Local");
     }
 }
