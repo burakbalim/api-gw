@@ -1,0 +1,24 @@
+{
+  "services": [
+    {
+      "service_name": "user-resource-service",
+      "service_url": "http://user-resource-service.staging.svc.cluster.local",
+      "access_client": [
+        "THIRD_PARTY",
+        "WEB_PAGE",
+        "PORTAL",
+        "ALLOWED_PATHS"
+      ]
+    },
+    {
+      "service_name": "word-flashy-service",
+      "service_url": "http://word-flashy-service.staging.svc.cluster.local",
+      "access_client": [
+        "THIRD_PARTY",
+        "WEB_PAGE",
+        "PORTAL",
+        "ALLOWED_PATHS"
+      ]
+    }
+  ]
+}

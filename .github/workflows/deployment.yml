@@ -1,0 +1,65 @@
+name: Trigger Tekton Pipeline
+
+env:
+  KUBERNETES_MASTER: ${{ secrets.KUBERNETES_MASTER }}
+  
+on:
+  push:
+    branches:
+      - 'main'
+      - 'staging'
+
+jobs:
+  trigger-tekton:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set environment variables based on branch
+        run: |
+          BRANCH=${GITHUB_REF#refs/heads/}
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          
+          if [ "$BRANCH" == "main" ]; then
+            echo "NAMESPACE=staging" >> $GITHUB_ENV
+            echo "BRANCH_ID=main" >> $GITHUB_ENV
+            echo "HELM_VALUES_ENV=staging" >> $GITHUB_ENV
+          elif [ "$BRANCH" == "staging" ]; then
+            echo "NAMESPACE=staging" >> $GITHUB_ENV
+            echo "BRANCH_ID=$BRANCH" >> $GITHUB_ENV
+            echo "HELM_VALUES_ENV=staging" >> $GITHUB_ENV
+          fi
+
+      - name: Set up kubectl and tkn
+        run: |
+          curl -LO "https://dl.k8s.io/release/stable.txt"
+          KUBECTL_VERSION=$(cat stable.txt)
+          curl -LO "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+          
+          curl -LO https://github.com/tektoncd/cli/releases/download/v0.30.0/tkn_0.30.0_Linux_x86_64.tar.gz
+          tar xvzf tkn_0.30.0_Linux_x86_64.tar.gz
+          sudo mv tkn /usr/local/bin/
+
+      - name: Deployment
+        run: |
+          mkdir -p /home/runner/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > /home/runner/.kube/config
+          chmod 600 /home/runner/.kube/config
+          export KUBECONFIG=/home/runner/.kube/config
+          kubectl get pipeline -n tekton-tasks
+          
+          tkn pipeline start service-deployment-pipeline \
+            --serviceaccount=tekton-pipeline-sa \
+            --namespace=tekton-tasks \
+            --param=BRANCH_ID=${{ env.BRANCH_ID }} \
+            --param=NAMESPACE=${{ env.NAMESPACE }} \
+            --param=HELM_VALUES_ENV=${{ env.HELM_VALUES_ENV }} \
+            --param=GIT_REPO_URL=https://github.com/burakbalim \
+            --param=SERVICES=api-gw \
+            --param=HELM_REPO_URL=https://burakbalim.github.io/kubernetes-infra/ \
+            --param=HELM_REPO_NAME=burakbalim \
+            --param=DOCKER_REGISTRY=ghcr.io/burakbalim \
+            --workspace name=shared-workspace,claimName=shared-workspace-pvc
