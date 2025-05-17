@@ -36,4 +36,15 @@ public class CustomPasswordProviderService extends CustomAuthProviderBase {
         }
         return new User(username, "Local");
     }
+
+    @Override
+    protected User verifyAsAdmin(CustomAuthenticationToken authentication) {
+        Map<String, Object> parameters = authentication.getParameters();
+        String username = (String) parameters.get("username");
+        Boolean isValidUser = this.userResourceService.validateAdminPassword(username, (String) parameters.get("password"));
+        if (!isValidUser) {
+            throw new UnauthorizedException("User is not valid");
+        }
+        return new User(username, "Local");
+    }
 }

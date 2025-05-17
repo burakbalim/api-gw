@@ -26,6 +26,9 @@ public class GoogleAuthProviderService extends CustomAuthProviderBase {
     @Value("${google.clientId}")
     private String clientId;
 
+    @Value("${google.adminClientId}")
+    private String clientAdminId;
+
     public GoogleAuthProviderService(UserResourceService userResourceService) {
         super(userResourceService);
     }
@@ -36,8 +39,14 @@ public class GoogleAuthProviderService extends CustomAuthProviderBase {
     }
 
     @Override
+    protected User verifyAsAdmin(CustomAuthenticationToken authentication) {
+        GoogleIdToken.Payload googlePayload = verifyGoogleToken((String) authentication.getParameters().get(OAuth2ParameterNames.ACCESS_TOKEN), clientAdminId);
+        return getUser(googlePayload);
+    }
+
+    @Override
     protected User verify(CustomAuthenticationToken authentication) {
-        GoogleIdToken.Payload googlePayload = verifyGoogleToken((String) authentication.getParameters().get(OAuth2ParameterNames.ACCESS_TOKEN));
+        GoogleIdToken.Payload googlePayload = verifyGoogleToken((String) authentication.getParameters().get(OAuth2ParameterNames.ACCESS_TOKEN), clientId);
         return getUser(googlePayload);
     }
 
@@ -52,7 +61,7 @@ public class GoogleAuthProviderService extends CustomAuthProviderBase {
         return user;
     }
 
-    public GoogleIdToken.Payload verifyGoogleToken(String idTokenString) {
+    public GoogleIdToken.Payload verifyGoogleToken(String idTokenString, String clientId) {
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                     new NetHttpTransport(), new GsonFactory())

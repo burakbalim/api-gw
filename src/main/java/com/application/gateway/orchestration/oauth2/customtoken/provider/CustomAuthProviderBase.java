@@ -10,7 +10,15 @@ public abstract class CustomAuthProviderBase implements CustomAuthProvider {
 
     private final UserResourceService userResourceService;
 
+    protected abstract User verifyAsAdmin(CustomAuthenticationToken authentication);
     protected abstract User verify(CustomAuthenticationToken authentication);
+
+    @Override
+    public User authenticateAsAdmin(CustomAuthenticationToken customAuthentication) {
+        User user = verifyAsAdmin(customAuthentication);
+
+        return userResourceService.createAdminOrGet(user);
+    }
 
     public User authenticate(CustomAuthenticationToken authentication) {
         User user = verify(authentication);

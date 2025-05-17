@@ -48,6 +48,11 @@ public class AppleAuthProviderService extends CustomAuthProviderBase {
     }
 
     @Override
+    protected User verifyAsAdmin(CustomAuthenticationToken authentication) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     protected User verify(CustomAuthenticationToken authentication) {
         try {
             Jwt jwt = jwtDecoder.decode((String) authentication.getParameters().get(OAuth2ParameterNames.ACCESS_TOKEN));

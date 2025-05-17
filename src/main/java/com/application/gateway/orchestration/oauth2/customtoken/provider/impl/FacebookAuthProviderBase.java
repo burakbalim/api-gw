@@ -10,10 +10,14 @@ import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.Version;
 import com.restfb.types.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
 
@@ -23,8 +27,14 @@ public class FacebookAuthProviderBase extends CustomAuthProviderBase {
     @Value("${facebook.app-secret}")
     private String appSecret;
 
-    public FacebookAuthProviderBase(UserResourceService userResourceService) {
+    //@Value("${facebook.app-id}")
+    private String appId;
+
+    private final RestTemplate restTemplate;
+
+    public FacebookAuthProviderBase(UserResourceService userResourceService, RestTemplate restTemplate) {
         super(userResourceService);
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -33,12 +43,33 @@ public class FacebookAuthProviderBase extends CustomAuthProviderBase {
     }
 
     @Override
+    protected com.application.gateway.orchestration.oauth2.model.User verifyAsAdmin(CustomAuthenticationToken authentication) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     protected com.application.gateway.orchestration.oauth2.model.User verify(CustomAuthenticationToken authentication) {
+        String accessToken = (String) authentication.getParameters().get(OAuth2ParameterNames.ACCESS_TOKEN);
+        String debugUrl = String.format(
+                "https://graph.facebook.com/debug_token?input_token=%s&access_token=%s|%s",
+                accessToken, appId, appSecret
+        );
         try {
-            FacebookClient facebookClient = new DefaultFacebookClient((String) authentication.getParameters().get(OAuth2ParameterNames.ACCESS_TOKEN),
-                    appSecret, Version.LATEST);
-            User me = facebookClient.fetchObject("me", User.class);
-            return getUser(me);
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    debugUrl, HttpMethod.GET, null, Object.class
+            );
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new UnauthorizedException("Invalid Facebook access token");
+            }
+            String meUrl = String.format(
+                    "https://graph.facebook.com/me?fields=id,email,birthday&access_token=%s",
+                    accessToken
+            );
+            ResponseEntity<User> meResponse = restTemplate.exchange(
+                    meUrl, HttpMethod.GET, null, User.class
+            );
+            return getUser(meResponse.getBody());
+
         } catch (Exception e) {
             throw new UnauthorizedException("Facebook login failed", e);
         }
@@ -56,6 +87,5 @@ public class FacebookAuthProviderBase extends CustomAuthProviderBase {
         }
         return ouath2User;
     }
-
-
 }
+

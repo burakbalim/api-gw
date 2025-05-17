@@ -20,6 +20,12 @@ public class UserResourceServiceImpl implements UserResourceService {
     @Value("${oauth.user.resource.validate}")
     private String resourceValidate;
 
+    @Value("${oauth.user.resource.portal.create}")
+    private String resourceAdminCreate;
+
+    @Value("${oauth.user.resource.portal.validate}")
+    private String resourceAdminValidate;
+
     private final RestTemplate restTemplate;
 
     @PostConstruct
@@ -40,6 +46,21 @@ public class UserResourceServiceImpl implements UserResourceService {
     @Override
     public Boolean validatePassword(String username, String password) {
         ResponseEntity<Boolean> response = restTemplate.getForEntity(String.format(resourceValidate, username, password), Boolean.class);
+        return response.getBody();
+    }
+
+    @Override
+    public User createAdminOrGet(User user) {
+        ResponseEntity<User> response = restTemplate.postForEntity(resourceAdminCreate, user, User.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return response.getBody();
+        }
+        throw new RuntimeException("Failed to create or get user: " + response.getStatusCode());
+    }
+
+    @Override
+    public Boolean validateAdminPassword(String username, String password) {
+        ResponseEntity<Boolean> response = restTemplate.getForEntity(String.format(resourceAdminValidate, username, password), Boolean.class);
         return response.getBody();
     }
 }

@@ -9,4 +9,8 @@ public interface CustomAuthProvider {
     AuthorizationGrantType getGrantType();
 
     User authenticate(CustomAuthenticationToken authentication);
+
+    default User authenticateAsAdmin(CustomAuthenticationToken customAuthentication) {
+        throw new UnsupportedOperationException();
+    };
 }
