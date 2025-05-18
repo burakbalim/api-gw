@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -59,8 +61,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     private User authenticate(CustomAuthenticationToken customAuthentication, OAuth2ClientAuthenticationToken clientPrincipal) {
         CustomAuthProvider customAuthProvider = customAuthProviderMap.get(customAuthentication.getGrantType());
         User user;
-        if (clientPrincipal.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(ROLE_ADMIN))) {
+        Set<String> scopes = Objects.requireNonNull(clientPrincipal.getRegisteredClient()).getScopes();
+        if (Objects.nonNull(scopes) && scopes.contains(ROLE_ADMIN)) {
             user = customAuthProvider.authenticateAsAdmin(customAuthentication);
         } else {
             user = customAuthProvider.authenticate(customAuthentication);
