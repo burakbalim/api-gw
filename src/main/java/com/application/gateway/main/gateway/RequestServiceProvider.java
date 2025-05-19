@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +40,7 @@ public class RequestServiceProvider {
         ResponseEntity<Object> responseEntity;
         if (requestInfoBase instanceof InternalRequestInfo) {
             responseEntity = externalEndpointRequestService.request(requestInfoBase);
-        }
-        else {
+        } else {
             responseEntity = virtualEndpointRequestService.request(requestInfoBase);
         }
         return responseEntity;
@@ -52,15 +52,15 @@ public class RequestServiceProvider {
 
     @Service
     @RequiredArgsConstructor
-    private static class VirtualEndpointRequestServiceImpl implements EndpointRequestService{
+    private static class VirtualEndpointRequestServiceImpl implements EndpointRequestService {
 
         private final VirtualEndpointProvider virtualEndpointProvider;
 
         @Override
         public ResponseEntity<Object> request(RequestInfoBase requestInfoBase) {
-             VirtualEndpointRequestInfo virtualRequestInfo  = (VirtualEndpointRequestInfo) requestInfoBase;
+            VirtualEndpointRequestInfo virtualRequestInfo = (VirtualEndpointRequestInfo) requestInfoBase;
 
-             return virtualEndpointProvider.request(virtualRequestInfo);
+            return virtualEndpointProvider.request(virtualRequestInfo);
         }
     }
 
@@ -84,27 +84,53 @@ public class RequestServiceProvider {
 
             String target = router.get(internalRequestInfo.getServiceName()) + UrlUtils.getOriginalURL(internalRequestInfo.getUri());
 
-            try {
-                return requestWithWebClient(internalRequestInfo, target);
-            } catch (HttpStatusCodeException e) {
-                return ResponseEntity.status(e.getStatusCode()).headers(e.getResponseHeaders()).body(e.getResponseBodyAsString());
-            }
+            return requestWithWebClient(internalRequestInfo, target);
         }
 
         private ResponseEntity<Object> request(InternalRequestInfo internalRequestInfo, String target) {
             Class<?> responseType;
             if (internalRequestInfo.isOctetStream()) {
                 responseType = byte[].class;
-            }
-            else {
+            } else {
                 responseType = Object.class;
             }
-            ResponseEntity<?> responseEntity = restTemplate.exchange(target, internalRequestInfo.getHttpMethod(), internalRequestInfo.getHttpEntity(), responseType);
-            return new ResponseEntity<>(responseEntity.getBody(), responseEntity.getHeaders(), responseEntity.getStatusCode());
+            try {
+                ResponseEntity<?> responseEntity = restTemplate.exchange(target, internalRequestInfo.getHttpMethod(), internalRequestInfo.getHttpEntity(), responseType);
+                return new ResponseEntity<>(responseEntity.getBody(), responseEntity.getHeaders(), responseEntity.getStatusCode());
+            } catch (HttpStatusCodeException e) {
+                return ResponseEntity.status(e.getStatusCode()).headers(e.getResponseHeaders()).body(e.getResponseBodyAsString());
+            }
         }
 
 
         public ResponseEntity<Object> requestWithWebClient(InternalRequestInfo internalRequestInfo, String target) {
+            try {
+                return executeRequest(internalRequestInfo, target);
+            } catch (WebClientResponseException e) {
+                return ResponseEntity
+                        .status(e.getStatusCode())
+                        .headers(e.getHeaders())
+                        .body(e.getResponseBodyAsString());
+            }
+        }
+
+        private ResponseEntity<Object> executeRequest(InternalRequestInfo internalRequestInfo, String target) {
+            WebClient.RequestHeadersSpec<?> requestSpec = prepareRequest(internalRequestInfo, target);
+            if (internalRequestInfo.isOctetStream()) {
+                ResponseEntity<byte[]> response = requestSpec
+                        .retrieve()
+                        .toEntity(byte[].class)
+                        .block();
+                return convertToObjectResponseEntity(response);
+            } else {
+                return requestSpec
+                        .retrieve()
+                        .toEntity(Object.class)
+                        .block();
+            }
+        }
+
+        private WebClient.RequestHeadersSpec<?> prepareRequest(InternalRequestInfo internalRequestInfo, String target) {
             WebClient.RequestBodySpec requestBodySpec = webClient
                     .method(internalRequestInfo.getHttpMethod())
                     .uri(target)
@@ -113,38 +139,19 @@ public class RequestServiceProvider {
                         httpHeaders.forEach(headers::addAll);
                     });
 
-
-            WebClient.RequestHeadersSpec<?> requestHeadersSpec;
             if (internalRequestInfo.getHttpEntity().getBody() != null) {
-                requestHeadersSpec = requestBodySpec.bodyValue(internalRequestInfo.getHttpEntity().getBody());
-            } else {
-                requestHeadersSpec = requestBodySpec;
+                return requestBodySpec.bodyValue(internalRequestInfo.getHttpEntity().getBody());
             }
 
-            if (internalRequestInfo.isOctetStream()) {
-                ResponseEntity<byte[]> responseEntity = requestHeadersSpec
-                        .retrieve()
-                        .toEntity(byte[].class)
-                        .block();
+            return requestBodySpec;
+        }
 
-                assert responseEntity != null;
-                return new ResponseEntity<>(
-                        responseEntity.getBody(),
-                        responseEntity.getHeaders(),
-                        responseEntity.getStatusCode()
-                );
-            } else {
-                ResponseEntity<Object> responseEntity = requestHeadersSpec
-                        .retrieve()
-                        .toEntity(Object.class)
-                        .block();
-                assert responseEntity != null;
-                return new ResponseEntity<>(
-                        responseEntity.getBody(),
-                        responseEntity.getHeaders(),
-                        responseEntity.getStatusCode()
-                );
-            }
+        private ResponseEntity<Object> convertToObjectResponseEntity(ResponseEntity<byte[]> byteResponse) {
+            return new ResponseEntity<>(
+                    byteResponse.getBody(),
+                    byteResponse.getHeaders(),
+                    byteResponse.getStatusCode()
+            );
         }
     }
 }
