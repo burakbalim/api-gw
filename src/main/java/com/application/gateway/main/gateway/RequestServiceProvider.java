@@ -7,11 +7,11 @@ import com.application.gateway.main.custompaths.CustomPathProvider;
 import com.application.gateway.main.router.Router;
 import com.application.gateway.main.virtualendpoints.VirtualEndpointProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
@@ -83,7 +83,7 @@ public class RequestServiceProvider {
             String target = router.get(internalRequestInfo.getServiceName()) + UrlUtils.getOriginalURL(internalRequestInfo.getUri());
 
             try {
-                return request(internalRequestInfo, target);
+                return requestWithWebClient(internalRequestInfo, target);
             } catch (HttpStatusCodeException e) {
                 return ResponseEntity.status(e.getStatusCode()).headers(e.getResponseHeaders()).body(e.getResponseBodyAsString());
             }
@@ -99,6 +99,49 @@ public class RequestServiceProvider {
             }
             ResponseEntity<?> responseEntity = restTemplate.exchange(target, internalRequestInfo.getHttpMethod(), internalRequestInfo.getHttpEntity(), responseType);
             return new ResponseEntity<>(responseEntity.getBody(), responseEntity.getHeaders(), responseEntity.getStatusCode());
+        }
+
+
+        public ResponseEntity<Object> requestWithWebClient(InternalRequestInfo internalRequestInfo, String target) {
+            WebClient.RequestBodySpec requestBodySpec = WebClient.create()
+                    .method(internalRequestInfo.getHttpMethod())
+                    .uri(target)
+                    .headers(headers -> {
+                        HttpHeaders httpHeaders = internalRequestInfo.getHttpEntity().getHeaders();
+                        httpHeaders.forEach(headers::addAll);
+                    });
+
+            WebClient.RequestHeadersSpec<?> requestHeadersSpec;
+            if (internalRequestInfo.getHttpEntity().getBody() != null) {
+                requestHeadersSpec = requestBodySpec.bodyValue(internalRequestInfo.getHttpEntity().getBody());
+            } else {
+                requestHeadersSpec = requestBodySpec;
+            }
+
+            if (internalRequestInfo.isOctetStream()) {
+                ResponseEntity<byte[]> responseEntity = requestHeadersSpec
+                        .retrieve()
+                        .toEntity(byte[].class)
+                        .block();
+
+                assert responseEntity != null;
+                return new ResponseEntity<>(
+                        responseEntity.getBody(),
+                        responseEntity.getHeaders(),
+                        responseEntity.getStatusCode()
+                );
+            } else {
+                ResponseEntity<Object> responseEntity = requestHeadersSpec
+                        .retrieve()
+                        .toEntity(Object.class)
+                        .block();
+                assert responseEntity != null;
+                return new ResponseEntity<>(
+                        responseEntity.getBody(),
+                        responseEntity.getHeaders(),
+                        responseEntity.getStatusCode()
+                );
+            }
         }
     }
 }
