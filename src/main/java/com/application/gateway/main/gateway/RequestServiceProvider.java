@@ -72,6 +72,8 @@ public class RequestServiceProvider {
 
         private final RestTemplate restTemplate;
 
+        private final WebClient webClient;
+
         @Override
         public ResponseEntity<Object> request(RequestInfoBase requestInfoBase) {
             InternalRequestInfo internalRequestInfo = (InternalRequestInfo) requestInfoBase;
@@ -103,13 +105,14 @@ public class RequestServiceProvider {
 
 
         public ResponseEntity<Object> requestWithWebClient(InternalRequestInfo internalRequestInfo, String target) {
-            WebClient.RequestBodySpec requestBodySpec = WebClient.create()
+            WebClient.RequestBodySpec requestBodySpec = webClient
                     .method(internalRequestInfo.getHttpMethod())
                     .uri(target)
                     .headers(headers -> {
                         HttpHeaders httpHeaders = internalRequestInfo.getHttpEntity().getHeaders();
                         httpHeaders.forEach(headers::addAll);
                     });
+
 
             WebClient.RequestHeadersSpec<?> requestHeadersSpec;
             if (internalRequestInfo.getHttpEntity().getBody() != null) {
