@@ -28,7 +28,7 @@ jobs:
           elif [ "$BRANCH" == "staging" ]; then
             echo "NAMESPACE=staging" >> $GITHUB_ENV
             echo "BRANCH_ID=$BRANCH" >> $GITHUB_ENV
-            echo "HELM_VALUES_ENV=staging" >> $GITHUB_ENV
+            echo "HELM_VALUES_ENV=staging-gsh" >> $GITHUB_ENV
           fi
 
       - name: Set up kubectl and tkn
