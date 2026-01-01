@@ -11,6 +11,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 @Service
+@ConditionalOnProperty(value="sign.google.enabled", havingValue = "true")
 public class GoogleAuthProviderService extends CustomAuthProviderBase {
 
     @Value("${google.clientId}")

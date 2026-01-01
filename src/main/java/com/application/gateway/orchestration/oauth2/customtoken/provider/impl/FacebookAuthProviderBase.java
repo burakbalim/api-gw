@@ -1,17 +1,13 @@
 package com.application.gateway.orchestration.oauth2.customtoken.provider.impl;
 
 import com.application.gateway.common.exception.UnauthorizedException;
-import com.application.gateway.main.common.util.LocalDateUtils;
 import com.application.gateway.orchestration.oauth2.customtoken.CustomAuthorizationGrantType;
 import com.application.gateway.orchestration.oauth2.customtoken.UserResourceService;
 import com.application.gateway.orchestration.oauth2.customtoken.provider.CustomAuthProviderBase;
 import com.application.gateway.orchestration.oauth2.model.CustomAuthenticationToken;
-import com.restfb.DefaultFacebookClient;
-import com.restfb.FacebookClient;
-import com.restfb.Version;
 import com.restfb.types.User;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -22,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Objects;
 
 @Service
+@ConditionalOnProperty(value="sign.facebook.enabled", havingValue = "true")
 public class FacebookAuthProviderBase extends CustomAuthProviderBase {
 
     @Value("${facebook.app-secret}")
