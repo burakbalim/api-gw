@@ -13,12 +13,14 @@ services:
       REDIS_PORT: ${REDIS_PORT:-6379}
       MONGO_HOST: ${MONGO_HOST}
       CONFIGURATION_PROVIDER: ${CONFIGURATION_PROVIDER:-FILE}
-      MOUNTED_DIRECTORY: ${MOUNTED_DIRECTORY:-/var/lib/api-gw/configuration}
+      MOUNTED_DIRECTORY: /configuration/
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_ADMIN_CLIENT_ID: ${GOOGLE_ADMIN_CLIENT_ID}
       FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET}
       GW_AUTHORIZATION_SECRET: ${GW_AUTHORIZATION_SECRET}
       OAUTH_USER_RESOURCE_URL: ${OAUTH_USER_RESOURCE_URL:-user-resource-service:80}
+    volumes:
+      - ${CONFIG_SOURCE_PATH:-/getspeakhub/staging/configuration}:/configuration/
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/gw/actuator/health"]
       interval: 30s
