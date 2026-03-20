@@ -1,10 +1,10 @@
 services:
   api-gw:
-    build: ../..
-    restart: unless-stopped
+    build: .
+    restart: always
     environment:
-      JAVA_OPTS: "-Xms256m -Xmx512m"
-      SPRING_PROFILES_ACTIVE: "test"
+      JAVA_OPTS: ${JAVA_OPTS:--Xms256m -Xmx512m}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-test}
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -29,19 +29,16 @@ services:
       replicas: 1
       resources:
         limits:
-          memory: 512M
-          cpus: "0.50"
+          memory: ${MEMORY_LIMIT:-512M}
+          cpus: ${CPU_LIMIT:-0.50}
     logging:
       driver: json-file
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: "50m"
+        max-file: "5"
     networks:
-      - staging-network
       - coolify
 
 networks:
-  staging-network:
-    external: true
   coolify:
     external: true

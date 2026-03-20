@@ -19,6 +19,16 @@
         "PORTAL",
         "ALLOWED_PATHS"
       ]
+    },
+    {
+      "service_name": "getspeakhub-service",
+      "service_url": "http://getspeakhub-service.staging.svc.cluster.local",
+      "access_client": [
+        "THIRD_PARTY",
+        "WEB_PAGE",
+        "PORTAL",
+        "ALLOWED_PATHS"
+      ]
     }
   ]
 }
