@@ -5,7 +5,7 @@ services:
       - "80"
     restart: always
     environment:
-      JAVA_OPTS: ${JAVA_OPTS:--Xms256m -Xmx512m}
+      JAVA_OPTS: ${JAVA_OPTS:--Xms256m -Xmx512m --enable-preview}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-test}
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -41,12 +41,8 @@ services:
         max-size: "50m"
         max-file: "5"
     networks:
-      - app-network
       - coolify
 
 networks:
-  app-network:
-    name: ${APP_NETWORK:-staging-network}
-    external: true
   coolify:
     external: true
